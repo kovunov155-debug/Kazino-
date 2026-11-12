@@ -1,0 +1,6 @@
+{
+  "name": "StickChop Casino — CRYPTO SPIN",
+  "description": "StickChop Casino — CRYPTO SPIN: крутите крипто-колесо фортуны, играйте в неоновые слоты, рулетку, блэкджек и коллекционируйте NFT-стикеры. Бесплатный демо-режим.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

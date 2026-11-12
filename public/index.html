@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickChop Casino — CRYPTO SPIN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <style>
+    body { background: #07070f; color: #fff; font-family: system-ui, sans-serif; }
+    .card { background: linear-gradient(135deg, #15152a 0%, #0c0c1a 100%); border: 1px solid rgba(168,85,247,0.3); }
+    .neon-gold { box-shadow: 0 0 25px rgba(245,158,11,0.35); border-color: rgba(245,158,11,0.5); }
+    .wheel { transition: transform 5s cubic-bezier(0.15, 0.85, 0.15, 1); }
+    .tab-act { background: linear-gradient(90deg, #ff6b35, #ec4899); color: #fff; font-weight: bold; }
+    .mult-act { background: linear-gradient(90deg, #ff6b35, #ec4899); color: #fff; font-weight: bold; }
+  </style>
+
+  <!-- JAVASCRIPT IN HEAD: NEVER CUT OFF -->
+  <script>
+    var balances = { ton: 3.50, usdt: 10.00, not: 2000, dogs: 10000, spins: 5 };
+    var currentRot = 0, spinning = false, mult = 1, isMuted = false;
+    var owned = ['cat'], historyData = [];
+
+    var prizes = [
+      { t: "ДЖЕКПОТ!", type: "jackpot", i: "🏆" },
+      { t: "0.5 TON", type: "ton", v: 0.5, i: "💎" },
+      { t: "1.0 USDT", type: "usdt", v: 1.0, i: "💵" },
+      { t: "1,000 NOT", type: "not", v: 1000, i: "⚡" },
+      { t: "+3 СПИНА", type: "spins", v: 3, i: "🎁" },
+      { t: "5,000 DOGS", type: "dogs", v: 5000, i: "🐶" },
+      { t: "2.5 TON", type: "ton", v: 2.5, i: "💎" },
+      { t: "5.0 USDT", type: "usdt", v: 5.0, i: "💵" }
+    ];
+
+    var audioCtx = null;
+    function playBeep(f, d) {
+      if (isMuted) return;
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx && AC) audioCtx = new AC();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        if (audioCtx) {
+          var osc = audioCtx.createOscillator();
+          var g = audioCtx.createGain();
+          osc.frequency.setValueAtTime(f || 600, audioCtx.currentTime);
+          g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (d || 0.05));
+          osc.connect(g);
+          g.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + (d || 0.05));
+        }
+      } catch (e) {}
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      var el = document.getElementById('soundBtn');
+      if (el) el.textContent = isMuted ? '🔇' : '🔊';
+    }
+
+    function updateUI() {
+      var hT = document.getElementById('headerTon'); if (hT) hT.textContent = balances.ton.toFixed(2);
+      var bT = document.getElementById('balTon'); if (bT) bT.textContent = balances.ton.toFixed(2);
+      var bU = document.getElementById('balUsdt'); if (bU) bU.textContent = balances.usdt.toFixed(2);
+      var bN = document.getElementById('balNot'); if (bN) bN.textContent = Math.floor(balances.not).toLocaleString('ru-RU');
+      var bD = document.getElementById('balDogs'); if (bD) bD.textContent = Math.floor(balances.dogs).toLocaleString('ru-RU');
+      var bS = document.getElementById('balSpins'); if (bS) bS.textContent = balances.spins + ' СПИН' + (balances.spins === 1 ? '' : balances.spins < 5 ? 'А' : 'ОВ');
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      if (balances.spins > 0) {
+        balances.spins--;
+      } else if (balances.ton >= 0.20) {
+        balances.ton -= 0.20;
+      } else {
+        openModal('buySpinsModal');
+        return;
+      }
+      updateUI();
+      spinning = true;
+      playBeep(400, 0.2);
+
+      var idx = Math.floor(Math.random() * 8);
+      var extra = 360 * (5 + Math.floor(Math.random() * 3));
+      var target = 360 - (idx * 45 + 22.5);
+      currentRot = currentRot + extra + target - (currentRot % 360);
+      var w = document.getElementById('wheel');
+      if (w) w.style.transform = 'rotate(' + currentRot + 'deg)';
+
+      var t = 0;
+      var tick = setInterval(function() {
+        playBeep(550, 0.03);
+        t += 150;
+        if (t > 4800) clearInterval(tick);
+      }, 150);
+
+      setTimeout(function() {
+        spinning = false;
+        var p = prizes[idx];
+        if (p.type === 'jackpot') { balances.ton += 10 * mult; balances.dogs += 25000 * mult; }
+        else if (p.type === 'ton') balances.ton += p.v * mult;
+        else if (p.type === 'usdt') balances.usdt += p.v * mult;
+        else if (p.type === 'not') balances.not += p.v * mult;
+        else if (p.type === 'dogs') balances.dogs += p.v * mult;
+        else if (p.type === 'spins') balances.spins += p.v * mult;
+        updateUI();
+        if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 70 });
+        showResult(p.i, p.t, 'Вы выиграли с множителем x' + mult + '!');
+        addHist('Колесо', p.t + ' (x' + mult + ')', true);
+      }, 5000);
+    }
+
+    function setMult(m) {
+      mult = m;
+      document.querySelectorAll('.mult-btn').forEach(function(b) {
+        b.className = 'mult-btn bg-[#181830] px-4 py-2 rounded-xl text-sm transition';
+        if (+b.getAttribute('data-m') === m) b.className = 'mult-btn mult-act px-4 py-2 rounded-xl text-sm transition';
+      });
+      var cM = document.getElementById('centerMult'); if (cM) cM.textContent = 'x' + m;
+      var sB = document.getElementById('spinActionBtn'); if (sB) sB.textContent = 'Крутить сейчас (x' + m + ')';
+    }
+
+    function showSec(id) {
+      ['spin', 'games', 'shop', 'history'].forEach(function(s) {
+        var el = document.getElementById('sec-' + s);
+        if (el) el.classList.add('hidden');
+        var btn = document.getElementById('nav-' + s);
+        if (btn) btn.className = 'section-btn bg-[#181830] px-5 py-2.5 rounded-full text-sm font-bold text-gray-300';
+      });
+      var target = document.getElementById('sec-' + id);
+      if (target) target.classList.remove('hidden');
+      var b = document.getElementById('nav-' + id);
+      if (b) b.className = 'section-btn tab-act px-5 py-2.5 rounded-full text-sm font-bold text-white';
+    }
+
+    function showGame(g) {
+      ['slots', 'roulette', 'blackjack'].forEach(function(k) {
+        var el = document.getElementById('game-' + k); if (el) el.classList.add('hidden');
+        var tab = document.getElementById('tab-' + k); if (tab) tab.className = 'minigame-tab bg-[#181830] text-gray-300 px-5 py-2 rounded-full font-bold text-sm';
+      });
+      var cur = document.getElementById('game-' + g); if (cur) cur.classList.remove('hidden');
+      var curT = document.getElementById('tab-' + g); if (curT) curT.className = 'minigame-tab bg-gradient-to-r from-orange-500 to-pink-500 text-white px-5 py-2 rounded-full font-bold text-sm';
+    }
+
+    var slotBet = 0.2;
+    function setSlotBet(b) {
+      slotBet = b;
+      var el = document.getElementById('slotsBetVal'); if (el) el.textContent = b.toFixed(2) + ' TON';
+    }
+
+    function playSlots() {
+      if (balances.ton < slotBet) return alert('Недостаточно TON!');
+      balances.ton -= slotBet;
+      updateUI();
+      var syms = ['💎', '👑', '💵', '⚡', '🐶', '🍒'];
+      var c = 0;
+      var int = setInterval(function() {
+        document.getElementById('r1').textContent = syms[Math.floor(Math.random() * syms.length)];
+        document.getElementById('r2').textContent = syms[Math.floor(Math.random() * syms.length)];
+        document.getElementById('r3').textContent = syms[Math.floor(Math.random() * syms.length)];
+        playBeep(450, 0.03);
+        c++;
+        if (c > 12) {
+          clearInterval(int);
+          var s1 = syms[Math.floor(Math.random() * syms.length)];
+          var s2 = Math.random() < 0.4 ? s1 : syms[Math.floor(Math.random() * syms.length)];
+          var s3 = Math.random() < 0.3 ? s1 : syms[Math.floor(Math.random() * syms.length)];
+          document.getElementById('r1').textContent = s1;
+          document.getElementById('r2').textContent = s2;
+          document.getElementById('r3').textContent = s3;
+          var box = document.getElementById('slotsResult');
+          if (s1 === s2 && s2 === s3) {
+            var w = slotBet * 10;
+            balances.ton += w;
+            if (typeof confetti === 'function') confetti({ particleCount: 70 });
+            box.textContent = '3x Совпадение (' + s1 + ')! +' + w.toFixed(2) + ' TON';
+            addHist('Слоты 3x', '+' + w.toFixed(2) + ' TON', true);
+          } else if (s1 === s2 || s2 === s3) {
+            var w2 = slotBet * 1.5;
+            balances.ton += w2;
+            box.textContent = 'Пара совпала! +' + w2.toFixed(2) + ' TON';
+            addHist('Слоты Пара', '+' + w2.toFixed(2) + ' TON', true);
+          } else {
+            box.textContent = 'Не повезло! Попробуйте снова.';
+            addHist('Слоты', '0 TON', false);
+          }
+          box.classList.remove('hidden');
+          updateUI();
+        }
+      }, 100);
+    }
+
+    var rBet = 'red';
+    function setRBet(t) {
+      rBet = t;
+      document.querySelectorAll('.r-btn').forEach(function(b) { b.className = 'r-btn py-2.5 rounded-xl bg-[#181830] text-gray-300'; });
+      var el = document.getElementById('rb-' + t);
+      if (el) el.className = 'r-btn py-2.5 rounded-xl bg-orange-500 text-white font-bold';
+    }
+
+    function playRoulette() {
+      if (balances.ton < 0.5) return alert('Недостаточно TON!');
+      balances.ton -= 0.5;
+      updateUI();
+      var c = 0;
+      var int = setInterval(function() {
+        document.getElementById('rouletteNum').textContent = Math.floor(Math.random() * 37);
+        playBeep(500, 0.03);
+        c++;
+        if (c > 12) {
+          clearInterval(int);
+          var n = Math.floor(Math.random() * 37);
+          var isRed = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].indexOf(n) !== -1;
+          document.getElementById('rouletteNum').textContent = n;
+          document.getElementById('rouletteColor').textContent = n === 0 ? 'ZERO' : isRed ? 'RED' : 'BLACK';
+          var win = false;
+          if (rBet === 'red' && isRed) win = true;
+          if (rBet === 'black' && !isRed && n !== 0) win = true;
+          if (rBet === 'even' && n !== 0 && n % 2 === 0) win = true;
+          if (rBet === 'zero' && n === 0) win = true;
+          var box = document.getElementById('rouletteResult');
+          if (win) {
+            var prize = rBet === 'zero' ? 0.5 * 36 : 1.0;
+            balances.ton += prize;
+            if (typeof confetti === 'function') confetti({ particleCount: 60 });
+            box.textContent = 'Победа! Выпало ' + n + '. +' + prize.toFixed(2) + ' TON';
+            addHist('Рулетка', '+' + prize.toFixed(2) + ' TON', true);
+          } else {
+            box.textContent = 'Выпало ' + n + '. Ставка не сыграла.';
+            addHist('Рулетка', '0 TON', false);
+          }
+          box.classList.remove('hidden');
+          updateUI();
+        }
+      }, 100);
+    }
+
+    var pC = [], dC = [], bjOn = false;
+    function startBJ() {
+      if (balances.ton < 0.5) return alert('Недостаточно TON!');
+      balances.ton -= 0.5;
+      updateUI();
+      bjOn = true;
+      pC = [Math.floor(Math.random()*10)+2, Math.floor(Math.random()*10)+2];
+      dC = [Math.floor(Math.random()*10)+2, Math.floor(Math.random()*10)+2];
+      renderBJ();
+      document.getElementById('bjStart').classList.add('hidden');
+      document.getElementById('bjPlay').classList.remove('hidden');
+      document.getElementById('bjResult').classList.add('hidden');
+    }
+    function renderBJ() {
+      var pT = pC.reduce(function(a,b){return a+b;},0);
+      document.getElementById('pScore').textContent = pT;
+      document.getElementById('pHand').innerHTML = pC.map(function(c){return '<div class="w-11 h-14 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold text-lg shadow">'+c+'</div>';}).join('');
+      if (bjOn) {
+        document.getElementById('dScore').textContent = dC[0] + ' + ?';
+        document.getElementById('dHand').innerHTML = '<div class="w-11 h-14 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold text-lg shadow">'+dC[0]+'</div><div class="w-11 h-14 bg-indigo-900 text-white rounded-lg flex items-center justify-center font-bold border border-indigo-400">?</div>';
+      } else {
+        var dT = dC.reduce(function(a,b){return a+b;},0);
+        document.getElementById('dScore').textContent = dT;
+        document.getElementById('dHand').innerHTML = dC.map(function(c){return '<div class="w-11 h-14 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold text-lg shadow">'+c+'</div>';}).join('');
+      }
+    }
+    function hitBJ() {
+      pC.push(Math.floor(Math.random()*10)+2);
+      renderBJ();
+      if (pC.reduce(function(a,b){return a+b;},0) > 21) endBJ(false, 'Перебор!');
+    }
+    function standBJ() {
+      bjOn = false;
+      while (dC.reduce(function(a,b){return a+b;},0) < 17) dC.push(Math.floor(Math.random()*10)+2);
+      renderBJ();
+      var pT = pC.reduce(function(a,b){return a+b;},0), dT = dC.reduce(function(a,b){return a+b;},0);
+      if (dT > 21 || pT > dT) endBJ(true, 'Победа! Ваши ' + pT + ' против ' + dT);
+      else if (pT === dT) { balances.ton += 0.5; endBJ(false, 'Ничья! Ставка возвращена'); }
+      else endBJ(false, 'Дилер выиграл: ' + dT + ' против ' + pT);
+    }
+    function endBJ(w, msg) {
+      bjOn = false;
+      document.getElementById('bjStart').classList.remove('hidden');
+      document.getElementById('bjPlay').classList.add('hidden');
+      var box = document.getElementById('bjResult');
+      box.textContent = msg;
+      box.classList.remove('hidden');
+      if (w) {
+        balances.ton += 1.0;
+        if (typeof confetti === 'function') confetti({ particleCount: 50 });
+        addHist('Блэкджек', '+1.00 TON', true);
+      } else {
+        addHist('Блэкджек', '0 TON', false);
+      }
+      updateUI();
+    }
+
+    function buySticker(id, em, cur, price) {
+      if (balances[cur] < price) return alert('Недостаточно ' + cur.toUpperCase() + '!');
+      balances[cur] -= price;
+      updateUI();
+      owned.push(id);
+      var b = document.getElementById('buy-' + id);
+      if (b) { b.textContent = 'Куплено'; b.disabled = true; b.className = 'mt-3 w-full py-2 rounded-xl bg-purple-600/30 text-purple-300 text-xs font-bold'; }
+      equip(em);
+      alert('Стикер приобретен и установлен на аватар!');
+      addHist('Стикер ' + em, '-' + price + ' ' + cur.toUpperCase(), true);
+    }
+    function equip(em) {
+      var av = document.getElementById('headerAvatar'); if (av) av.textContent = em;
+    }
+
+    function addHist(title, prize, win) {
+      historyData.unshift({ t: title, p: prize, w: win, time: new Date().toLocaleTimeString('ru-RU') });
+      renderHist();
+    }
+    function renderHist() {
+      var el = document.getElementById('historyList'); if (!el) return;
+      if (historyData.length === 0) { el.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm">Пока нет ставок</div>'; return; }
+      el.innerHTML = historyData.slice(0, 15).map(function(h) {
+        return '<div class="bg-[#121226] border border-[#222244] rounded-xl p-3 flex justify-between items-center text-xs"><div><span class="font-bold text-white">'+h.t+'</span><span class="text-gray-500 ml-2">'+h.time+'</span></div><div class="font-bold font-mono '+(h.w?'text-emerald-400':'text-gray-400')+'">'+h.p+'</div></div>';
+      }).join('');
+    }
+    function clearHist() { historyData = []; renderHist(); }
+
+    function showResult(icon, title, desc) {
+      document.getElementById('mIcon').textContent = icon;
+      document.getElementById('mTitle').textContent = title;
+      document.getElementById('mDesc').textContent = desc;
+      openModal('resultModal');
+    }
+    function openModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+    function closeModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+    }
+    function claimFaucet() {
+      balances.ton += 2.5; balances.usdt += 10.0; balances.spins += 5;
+      updateUI(); closeModal('faucetModal');
+      if (typeof confetti === 'function') confetti({ particleCount: 50 });
+      alert('Демо-баланс успешно пополнен (+2.5 TON, +5 Спинов)!');
+    }
+    function buySpins(cnt, cost) {
+      if (balances.ton < cost) return alert('Недостаточно TON!');
+      balances.ton -= cost; balances.spins += cnt;
+      updateUI(); closeModal('buySpinsModal');
+      alert('Куплено ' + cnt + ' спинов!');
+    }
+    function connectWallet(name) {
+      var btn = document.getElementById('walletBtn');
+      if (btn) btn.textContent = 'EQD...8x9F';
+      closeModal('walletModal');
+      alert('Кошелек ' + name + ' подключен!');
+    }
+
+    window.onload = function() {
+      updateUI();
+    };
+  </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#0a0a16]/90 backdrop-blur border-b border-[#1a1a2e] sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 flex items-center justify-center text-xl shadow-lg shadow-orange-500/30">🎰</div>
+        <div>
+          <div class="font-black text-lg bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">StickChop Casino</div>
+          <div class="text-[10px] font-bold text-gray-400">CRYPTO SPIN & STICKERS</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="soundBtn" onclick="toggleMute()" class="p-2 rounded-xl bg-[#141428] border border-[#252542] text-emerald-400 text-xs font-bold" title="Звук">🔊</button>
+        <button onclick="openModal('faucetModal')" class="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold">🎁 Кран</button>
+        <div class="flex items-center gap-1.5 bg-[#141428] border border-cyan-500/30 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold">
+          <span>💎</span>
+          <span id="headerTon" class="text-cyan-300 font-mono">3.50</span>
+          <span class="text-gray-400 text-[10px]">TON</span>
+        </div>
+        <div id="headerAvatar" class="w-9 h-9 rounded-full bg-[#1b1b36] border border-pink-500/60 flex items-center justify-center text-lg">🐱</div>
+        <button onclick="openModal('walletModal')" id="walletBtn" class="bg-gradient-to-r from-orange-500 to-pink-500 px-4 py-2 rounded-full text-xs font-extrabold shadow-md">Войти</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="py-10 text-center relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300 text-xs font-bold mb-3">
+        ✨ Колесо Фортуны в Telegram & Web · Демо
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-orange-400 via-pink-500 to-purple-400 bg-clip-text text-transparent mb-3">
+        CRYPTO SPIN
+      </h1>
+      <p class="text-gray-300 text-sm sm:text-base max-w-lg mx-auto mb-6">
+        Крутите колесо фортуны, играйте в слоты и рулетку, собирайте коллекционные NFT стикеры!
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button onclick="showSec('spin')" class="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-slate-950 font-black px-7 py-3 rounded-full text-sm shadow-lg shadow-orange-500/25">
+          🎰 Крутить колесо
+        </button>
+        <button onclick="showSec('games')" class="border border-purple-500/50 bg-[#16162d] px-6 py-3 rounded-full font-bold text-purple-200 text-sm">
+          🎮 Все игры
+        </button>
+        <button onclick="openModal('faucetModal')" class="flex sm:hidden border border-emerald-500/40 bg-emerald-500/15 px-5 py-3 rounded-full font-bold text-emerald-300 text-xs">
+          🎁 Кран
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 pb-20 w-full flex-1">
+    <!-- Balances -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div class="card rounded-2xl p-3.5 text-center border-cyan-500/40">
+        <div class="text-2xl mb-1">💎</div>
+        <div id="balTon" class="text-2xl font-black font-mono text-cyan-300">3.50</div>
+        <div class="text-[10px] font-bold text-cyan-400/80">TONCOIN</div>
+      </div>
+      <div class="card rounded-2xl p-3.5 text-center border-emerald-500/40">
+        <div class="text-2xl mb-1">💵</div>
+        <div id="balUsdt" class="text-2xl font-black font-mono text-emerald-300">10.00</div>
+        <div class="text-[10px] font-bold text-emerald-400/80">USDT TRC20</div>
+      </div>
+      <div class="card rounded-2xl p-3.5 text-center border-violet-500/40">
+        <div class="text-2xl mb-1">⚡</div>
+        <div id="balNot" class="text-2xl font-black font-mono text-violet-300">2 000</div>
+        <div class="text-[10px] font-bold text-violet-400/80">NOTCOIN</div>
+      </div>
+      <div class="card rounded-2xl p-3.5 text-center border-amber-500/40">
+        <div class="text-2xl mb-1">🐶</div>
+        <div id="balDogs" class="text-2xl font-black font-mono text-amber-300">10 000</div>
+        <div class="text-[10px] font-bold text-amber-400/80">DOGS COIN</div>
+      </div>
+    </div>
+
+    <!-- Free Spins Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3 bg-[#111124] border border-[#22223f] rounded-2xl px-4 py-2.5 text-xs text-gray-300">
+      <div class="flex items-center gap-2">
+        <span class="text-pink-400 font-bold">🎰 Доступно вращений:</span>
+        <span id="balSpins" class="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-mono font-bold px-2.5 py-0.5 rounded-full text-xs">5 СПИНОВ</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openModal('buySpinsModal')" class="text-orange-400 hover:underline font-bold">✨ Купить спины</button>
+        <span class="text-gray-600">·</span>
+        <button onclick="openModal('faucetModal')" class="text-emerald-400 hover:underline font-bold">🎁 Кран</button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
+      <button onclick="showSec('spin')" id="nav-spin" class="section-btn tab-act px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap">🎰 Крипто-Спин</button>
+      <button onclick="showSec('games')" id="nav-games" class="section-btn bg-[#181830] px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap text-gray-300">🎮 Игры</button>
+      <button onclick="showSec('shop')" id="nav-shop" class="section-btn bg-[#181830] px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap text-gray-300">🛍️ Стикеры</button>
+      <button onclick="showSec('history')" id="nav-history" class="section-btn bg-[#181830] px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap text-gray-300">📜 История</button>
+    </div>
+
+    <!-- 1. SPIN SECTION -->
+    <div id="sec-spin" class="card neon-gold rounded-3xl p-6 sm:p-10">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+        <!-- Wheel -->
+        <div class="relative w-72 h-72 sm:w-96 sm:h-96 shrink-0 flex items-center justify-center">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-8 h-8 bg-gradient-to-b from-yellow-300 to-orange-500 rotate-45 rounded-md flex items-center justify-center shadow-lg border-2 border-white/60">
+            <div class="w-3 h-3 bg-pink-600 rounded-full -rotate-45"></div>
+          </div>
+          <div id="wheel" class="wheel w-full h-full rounded-full shadow-2xl relative select-none">
+            <svg viewBox="0 0 400 400" class="w-full h-full drop-shadow-xl">
+              <defs>
+                <radialGradient id="g-gold" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#fbbf24"/><stop offset="100%" stopColor="#b45309"/></radialGradient>
+                <radialGradient id="g-blue" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#0284c7"/><stop offset="100%" stopColor="#0c4a6e"/></radialGradient>
+                <radialGradient id="g-green" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#059669"/><stop offset="100%" stopColor="#064e3b"/></radialGradient>
+                <radialGradient id="g-purple" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#c026d3"/><stop offset="100%" stopColor="#581c87"/></radialGradient>
+                <radialGradient id="g-pink" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#db2777"/><stop offset="100%" stopColor="#831843"/></radialGradient>
+                <radialGradient id="g-orange" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#ea580c"/><stop offset="100%" stopColor="#7c2d12"/></radialGradient>
+                <radialGradient id="g-darkblue" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#2563eb"/><stop offset="100%" stopColor="#1e3a8a"/></radialGradient>
+                <radialGradient id="g-teal" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#0d9488"/><stop offset="100%" stopColor="#134e4a"/></radialGradient>
+              </defs>
+              <circle cx="200" cy="200" r="196" fill="#0d0d1a" stroke="#f59e0b" stroke-width="6"/>
+              <path d="M 200 200 L 200 12 A 188 188 0 0 1 332.9 67.1 Z" fill="url(#g-gold)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 332.9 67.1 A 188 188 0 0 1 388 200 Z" fill="url(#g-blue)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 388 200 A 188 188 0 0 1 332.9 332.9 Z" fill="url(#g-green)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 332.9 332.9 A 188 188 0 0 1 200 388 Z" fill="url(#g-purple)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 200 388 A 188 188 0 0 1 67.1 332.9 Z" fill="url(#g-pink)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 67.1 332.9 A 188 188 0 0 1 12 200 Z" fill="url(#g-orange)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 12 200 A 188 188 0 0 1 67.1 67.1 Z" fill="url(#g-darkblue)" stroke="#1a1a2e" stroke-width="2"/>
+              <path d="M 200 200 L 67.1 67.1 A 188 188 0 0 1 200 12 Z" fill="url(#g-teal)" stroke="#1a1a2e" stroke-width="2"/>
+              <g transform="rotate(22.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">🏆</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">ДЖЕКПОТ!</text></g>
+              <g transform="rotate(67.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">💎</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">0.5 TON</text></g>
+              <g transform="rotate(112.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">💵</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">1.0 USDT</text></g>
+              <g transform="rotate(157.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">⚡</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">1,000 NOT</text></g>
+              <g transform="rotate(202.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">🎁</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">+3 СПИНА</text></g>
+              <g transform="rotate(247.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">🐶</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">5,000 DOGS</text></g>
+              <g transform="rotate(292.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">💎</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">2.5 TON</text></g>
+              <g transform="rotate(337.5, 200, 200)"><text x="200" y="65" text-anchor="middle" font-size="20">💵</text><text x="200" y="95" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">5.0 USDT</text></g>
+            </svg>
+          </div>
+          <!-- Center Button -->
+          <button id="spinCenterBtn" onclick="spinWheel()" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-orange-500 via-pink-600 to-purple-700 border-4 border-amber-300 flex flex-col items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition z-10 cursor-pointer">
+            <span class="text-3xl">🎰</span>
+            <span class="text-xs font-black text-white">SPIN</span>
+            <span id="centerMult" class="text-[10px] text-amber-200 font-mono font-bold">x1</span>
+          </button>
+        </div>
+
+        <!-- Wheel Controls -->
+        <div class="flex-1 text-center lg:text-left">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/15 border border-pink-500/40 text-pink-300 text-xs font-bold mb-3">
+            🏆 Джекпот: 10 TON + 25 000 DOGS
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-black text-white mb-2">Колесо Фортуны</h2>
+          <p class="text-gray-300 text-sm mb-5">Выигрывайте TON, USDT, NOT и DOGS с умножением ставки:</p>
+          <div class="mb-6">
+            <div class="text-xs text-gray-400 mb-2 font-bold">Множитель выигрыша:</div>
+            <div class="flex justify-center lg:justify-start gap-2">
+              <button onclick="setMult(1)" class="mult-btn mult-act px-4 py-2 rounded-xl text-sm" data-m="1">x1</button>
+              <button onclick="setMult(2)" class="mult-btn bg-[#181830] px-4 py-2 rounded-xl text-sm" data-m="2">x2</button>
+              <button onclick="setMult(5)" class="mult-btn bg-[#181830] px-4 py-2 rounded-xl text-sm" data-m="5">x5</button>
+              <button onclick="setMult(10)" class="mult-btn bg-[#181830] px-4 py-2 rounded-xl text-sm" data-m="10">x10</button>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button onclick="spinWheel()" id="spinActionBtn" class="flex-1 py-4 rounded-2xl bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 font-black text-base shadow-xl shadow-pink-500/30">
+              Крутить сейчас (x1)
+            </button>
+            <button onclick="openModal('buySpinsModal')" class="py-4 px-6 rounded-2xl bg-[#1b1b36] border border-purple-500/40 text-purple-200 font-bold text-sm">
+              🔥 Купить спины
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. GAMES SECTION -->
+    <div id="sec-games" class="hidden space-y-6">
+      <div class="flex items-center gap-2 mb-4">
+        <button onclick="showGame('slots')" id="tab-slots" class="minigame-tab bg-gradient-to-r from-orange-500 to-pink-500 text-white px-5 py-2 rounded-full font-bold text-sm">🎰 Слоты</button>
+        <button onclick="showGame('roulette')" id="tab-roulette" class="minigame-tab bg-[#181830] text-gray-300 px-5 py-2 rounded-full font-bold text-sm">🎡 Рулетка</button>
+        <button onclick="showGame('blackjack')" id="tab-blackjack" class="minigame-tab bg-[#181830] text-gray-300 px-5 py-2 rounded-full font-bold text-sm">🃏 Блэкджек</button>
+      </div>
+
+      <!-- Slots View -->
+      <div id="game-slots" class="card rounded-3xl p-6 sm:p-8 text-center max-w-xl mx-auto border-pink-500/40">
+        <h3 class="text-2xl font-black mb-2">🎰 Неоновые Слоты</h3>
+        <p class="text-gray-400 text-xs mb-5">Соберите 3 одинаковых символа и получите до x25 ставки!</p>
+        <div class="bg-[#0b0b18] border-4 border-amber-400/50 rounded-3xl p-6 mb-5">
+          <div class="grid grid-cols-3 gap-3">
+            <div id="r1" class="h-24 rounded-2xl bg-[#181836] border-2 border-purple-500/40 flex items-center justify-center text-5xl">💎</div>
+            <div id="r2" class="h-24 rounded-2xl bg-[#181836] border-2 border-purple-500/40 flex items-center justify-center text-5xl">👑</div>
+            <div id="r3" class="h-24 rounded-2xl bg-[#181836] border-2 border-purple-500/40 flex items-center justify-center text-5xl">💎</div>
+          </div>
+        </div>
+        <div id="slotsResult" class="hidden mb-4 p-3 rounded-xl bg-pink-500/20 text-yellow-300 font-bold text-sm"></div>
+        <div class="flex items-center justify-between mb-5 bg-[#121226] p-3 rounded-2xl text-xs border border-[#222244]">
+          <span>Ставка: <strong id="slotsBetVal" class="text-cyan-300 font-mono">0.20 TON</strong></span>
+          <div class="flex gap-1.5">
+            <button onclick="setSlotBet(0.1)" class="px-2.5 py-1 rounded bg-[#1c1c38] font-bold">0.1</button>
+            <button onclick="setSlotBet(0.2)" class="px-2.5 py-1 rounded bg-orange-500 text-white font-bold">0.2</button>
+            <button onclick="setSlotBet(0.5)" class="px-2.5 py-1 rounded bg-[#1c1c38] font-bold">0.5</button>
+            <button onclick="setSlotBet(1.0)" class="px-2.5 py-1 rounded bg-[#1c1c38] font-bold">1.0</button>
+          </div>
+        </div>
+        <button onclick="playSlots()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-pink-600 font-black text-base shadow-lg">Крутить слоты</button>
+      </div>
+
+      <!-- Roulette View -->
+      <div id="game-roulette" class="hidden card rounded-3xl p-6 sm:p-8 text-center max-w-xl mx-auto border-cyan-500/40">
+        <h3 class="text-2xl font-black mb-2">🎡 Рулетка</h3>
+        <p class="text-gray-400 text-xs mb-5">Ставки на Красное, Черное, Четное или Зеро!</p>
+        <div class="w-28 h-28 mx-auto rounded-full border-4 border-yellow-500/60 bg-[#14142a] flex flex-col items-center justify-center mb-5 shadow-xl">
+          <div id="rouletteNum" class="text-3xl font-black font-mono">0</div>
+          <div id="rouletteColor" class="text-[10px] uppercase font-bold text-emerald-400">ZERO</div>
+        </div>
+        <div id="rouletteResult" class="hidden mb-4 p-3 rounded-xl bg-purple-500/20 text-yellow-300 font-bold text-sm"></div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5 text-xs font-bold">
+          <button onclick="setRBet('red')" id="rb-red" class="r-btn py-2.5 rounded-xl bg-rose-600 text-white">🔴 Красное (x2)</button>
+          <button onclick="setRBet('black')" id="rb-black" class="r-btn py-2.5 rounded-xl bg-[#181830] text-gray-300">⚫ Черное (x2)</button>
+          <button onclick="setRBet('even')" id="rb-even" class="r-btn py-2.5 rounded-xl bg-[#181830] text-gray-300">Четное (x2)</button>
+          <button onclick="setRBet('zero')" id="rb-zero" class="r-btn py-2.5 rounded-xl bg-[#181830] text-emerald-300">🟢 Зеро (x36)</button>
+        </div>
+        <button onclick="playRoulette()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-pink-600 font-black text-base shadow-lg">Крутить рулетку (0.5 TON)</button>
+      </div>
+
+      <!-- Blackjack View -->
+      <div id="game-blackjack" class="hidden card rounded-3xl p-6 sm:p-8 max-w-xl mx-auto border-purple-500/40">
+        <h3 class="text-2xl font-black mb-2 text-center">🃏 Блэкджек 21</h3>
+        <p class="text-gray-400 text-xs mb-5 text-center">Обыграйте дилера, набрав сумму ближе к 21 очку!</p>
+        <div class="bg-[#0b241b] border-2 border-emerald-600/70 rounded-2xl p-4 mb-5 text-left">
+          <div class="text-xs font-bold text-emerald-300 uppercase mb-1">Дилер: <span id="dScore" class="font-mono">?</span></div>
+          <div id="dHand" class="flex gap-2 mb-3 min-h-[60px]"></div>
+          <div class="text-xs font-bold text-emerald-300 uppercase mb-1">Вы: <span id="pScore" class="font-mono text-yellow-300">0</span></div>
+          <div id="pHand" class="flex gap-2 min-h-[60px]"></div>
+        </div>
+        <div id="bjResult" class="hidden mb-4 p-3 rounded-xl bg-yellow-500/20 text-yellow-300 font-bold text-sm text-center"></div>
+        <div id="bjStart">
+          <button onclick="startBJ()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 font-black text-base shadow-lg">Раздать карты (0.5 TON)</button>
+        </div>
+        <div id="bjPlay" class="hidden grid grid-cols-2 gap-3">
+          <button onclick="hitBJ()" class="py-3 rounded-xl bg-orange-500 font-black text-slate-950">➕ Еще карту</button>
+          <button onclick="standBJ()" class="py-3 rounded-xl bg-purple-600 font-black text-white">🛑 Хватит</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. STICKERS SECTION -->
+    <div id="sec-shop" class="hidden">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-2xl font-black">🛍️ Магазин стикеров</h2>
+        <div class="text-xs text-gray-300 bg-[#121226] px-3 py-1.5 rounded-full border border-purple-500/40">NFT Коллекция</div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div class="card rounded-2xl p-4 text-center flex flex-col justify-between">
+          <div><div class="text-[10px] font-bold text-emerald-400">COMMON</div><div class="text-5xl my-3">🐱</div><div class="font-bold text-sm">Cyber Cat</div><div class="text-xs text-gray-400">500 NOT</div></div>
+          <button onclick="equip('🐱')" class="mt-3 w-full py-2 rounded-xl bg-purple-600/30 text-purple-200 text-xs font-bold">Надет</button>
+        </div>
+        <div class="card rounded-2xl p-4 text-center flex flex-col justify-between">
+          <div><div class="text-[10px] font-bold text-sky-400">RARE</div><div class="text-5xl my-3">🌳</div><div class="font-bold text-sm">Tree of Life</div><div class="text-xs text-gray-400">1.0 TON</div></div>
+          <button id="buy-tree" onclick="buySticker('tree','🌳','ton',1.0)" class="mt-3 w-full py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold">Купить</button>
+        </div>
+        <div class="card rounded-2xl p-4 text-center flex flex-col justify-between">
+          <div><div class="text-[10px] font-bold text-amber-400">EPIC</div><div class="text-5xl my-3">💎</div><div class="font-bold text-sm">Diamond</div><div class="text-xs text-gray-400">5.0 USDT</div></div>
+          <button id="buy-diamond" onclick="buySticker('diamond','💎','usdt',5.0)" class="mt-3 w-full py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold">Купить</button>
+        </div>
+        <div class="card rounded-2xl p-4 text-center flex flex-col justify-between">
+          <div><div class="text-[10px] font-bold text-pink-400">SECRET</div><div class="text-5xl my-3">👑</div><div class="font-bold text-sm">Secret King</div><div class="text-xs text-gray-400">15k DOGS</div></div>
+          <button id="buy-king" onclick="buySticker('king','👑','dogs',15000)" class="mt-3 w-full py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold">Купить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. HISTORY SECTION -->
+    <div id="sec-history" class="hidden card rounded-3xl p-6 sm:p-8">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-2xl font-black">📜 История ставок</h2>
+        <button onclick="clearHist()" class="text-xs text-red-400 hover:underline">Очистить</button>
+      </div>
+      <div id="historyList" class="space-y-2">
+        <div class="text-center py-8 text-gray-500 text-sm">Пока нет ставок</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-[#1a1a2e] py-6 text-center text-gray-500 text-xs bg-[#06060c]">
+    <p class="font-bold text-gray-400 mb-1">🎰 StickChop Casino • CRYPTO SPIN</p>
+    <p>Демо-версия для развлечения • Нет реальных денег</p>
+  </footer>
+
+  <!-- Modal: Result -->
+  <div id="resultModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-7 max-w-sm w-full text-center neon-gold">
+      <div id="mIcon" class="text-5xl mb-3 animate-bounce">🎉</div>
+      <h3 class="text-2xl font-black mb-1 text-white" id="mTitle">Победа!</h3>
+      <p class="text-gray-300 text-sm mb-5" id="mDesc"></p>
+      <button onclick="closeModal('resultModal')" class="bg-gradient-to-r from-orange-500 to-pink-500 w-full py-3.5 rounded-2xl font-black text-white">Забрать выигрыш</button>
+    </div>
+  </div>
+
+  <!-- Modal: Faucet -->
+  <div id="faucetModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 max-w-sm w-full text-center">
+      <div class="text-4xl mb-2">🎁</div>
+      <h3 class="text-xl font-black mb-2 text-white">Бесплатный Кран</h3>
+      <p class="text-xs text-gray-300 mb-4">Пополните балансы и получите бесплатные вращения!</p>
+      <button onclick="claimFaucet()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 font-black text-slate-950 text-sm">Пополнить балансы (+2.5 TON, +5 Спинов)</button>
+    </div>
+  </div>
+
+  <!-- Modal: Buy Spins -->
+  <div id="buySpinsModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 max-w-sm w-full">
+      <h3 class="text-xl font-black mb-3 text-center text-white">Купить спины</h3>
+      <div class="space-y-2 mb-4">
+        <button onclick="buySpins(5, 0.5)" class="w-full p-3 rounded-xl bg-[#16162d] flex justify-between items-center text-xs">
+          <span class="font-bold text-white">5 Спинов</span>
+          <span class="text-amber-400 font-mono font-bold">0.50 TON</span>
+        </button>
+        <button onclick="buySpins(15, 1.2)" class="w-full p-3 rounded-xl bg-[#16162d] flex justify-between items-center text-xs">
+          <span class="font-bold text-white">15 Спинов (+2 бонус)</span>
+          <span class="text-amber-400 font-mono font-bold">1.20 TON</span>
+        </button>
+      </div>
+      <button onclick="closeModal('buySpinsModal')" class="w-full py-2 rounded-xl bg-[#222244] text-xs font-bold text-gray-300">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Modal: Wallet -->
+  <div id="walletModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 max-w-sm w-full text-center">
+      <h3 class="text-xl font-black mb-2 text-white">TON Кошелек</h3>
+      <p class="text-xs text-gray-400 mb-4">Выберите кошелек:</p>
+      <div class="space-y-2 mb-4">
+        <button onclick="connectWallet('Tonkeeper')" class="w-full p-3 rounded-xl bg-[#16162d] text-left text-xs font-bold flex items-center gap-2">💎 Tonkeeper</button>
+        <button onclick="connectWallet('Telegram Wallet')" class="w-full p-3 rounded-xl bg-[#16162d] text-left text-xs font-bold flex items-center gap-2">✈️ Telegram Wallet</button>
+      </div>
+      <button onclick="closeModal('walletModal')" class="w-full py-2 rounded-xl bg-[#222244] text-xs font-bold text-gray-300">Закрыть</button>
+    </div>
+  </div>
+</body>
+</html>

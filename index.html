@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickChop Casino — CRYPTO SPIN | Крипто Колесо Фортуны Демо</title>
+  <meta name="description" content="StickChop Casino — CRYPTO SPIN: крутите крипто-колесо фортуны, играйте в неоновые слоты, рулетку, блэкджек и коллекционируйте NFT-стикеры. Пополнение, вывод средств и панель администратора." />
+  <meta name="keywords" content="StickChop Casino, CRYPTO SPIN, крипто казино, колесо фортуны, вывод денег, пополнение, TON, NOT, DOGS, слоты, рулетка, блэкджек" />
+  <meta name="author" content="StickChop Casino" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <link rel="canonical" href="https://kovunov155-debug.github.io/Kazino-/" />
+
+  <!-- OpenGraph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://kovunov155-debug.github.io/Kazino-/" />
+  <meta property="og:site_name" content="StickChop Casino" />
+  <meta property="og:title" content="StickChop Casino — CRYPTO SPIN" />
+  <meta property="og:description" content="StickChop Casino — CRYPTO SPIN: крипто-колесо фортуны, слоты, рулетка, блэкджек, пополнение и вывод средств." />
+  <meta property="og:locale" content="ru_RU" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://kovunov155-debug.github.io/Kazino-/" />
+  <meta name="twitter:title" content="StickChop Casino — CRYPTO SPIN" />
+  <meta name="twitter:description" content="StickChop Casino — CRYPTO SPIN: крипто-колесо фортуны, слоты, рулетка, блэкджек, пополнение и вывод средств." />
+
+  <!-- Schema.org JSON-LD Structured Data for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "StickChop Casino — CRYPTO SPIN",
+    "alternateName": ["StickChop Casino", "CRYPTO SPIN"],
+    "url": "https://kovunov155-debug.github.io/Kazino-/",
+    "applicationCategory": "GameApplication",
+    "genre": "Casino Game Simulation",
+    "operatingSystem": "All",
+    "description": "StickChop Casino — CRYPTO SPIN: крипто-колесо фортуны, слоты, рулетка, блэкджек, пополнение и вывод средств.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "StickChop Casino"
+    }
+  }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    @keyframes neonPulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(255, 107, 53, 0.4), inset 0 0 15px rgba(255, 107, 53, 0.1); }
+      50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.7), inset 0 0 25px rgba(236, 72, 153, 0.2); }
+    }
+    @keyframes goldPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); border-color: rgba(245, 158, 11, 0.6); }
+      50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.85); border-color: rgba(251, 191, 36, 1); }
+    }
+    @keyframes bulbGlow {
+      0%, 100% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 8px #ffb700); }
+    }
+    @keyframes marqueeText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    @keyframes floatEffect {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    
+    body { background: #070712; color: #fff; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+    .card { background: linear-gradient(135deg, #131326 0%, #0a0a16 100%); border: 1px solid rgba(168, 85, 247, 0.25); }
+    .card-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.15); }
+    .neon-border { animation: neonPulse 3s infinite; }
+    .neon-gold { animation: goldPulse 2.5s infinite; }
+    .floating-badge { animation: floatEffect 3s ease-in-out infinite; }
+    .marquee-inner { display: inline-block; white-space: nowrap; animation: marqueeText 24s linear infinite; }
+    .marquee-inner:hover { animation-play-state: paused; }
+    .wheel { transition: transform 5s cubic-bezier(0.15, 0.85, 0.15, 1); }
+    .tab-act { background: linear-gradient(90deg, #ff6b35, #ec4899); color: #fff; font-weight: 800; box-shadow: 0 0 15px rgba(236, 72, 153, 0.4); }
+    .mult-act { background: linear-gradient(90deg, #ff6b35, #ec4899); color: #fff; font-weight: 900; box-shadow: 0 0 15px rgba(255, 107, 53, 0.6); }
+    .bulb { animation: bulbGlow 1.2s infinite ease-in-out; }
+    .bulb:nth-child(even) { animation-delay: 0.6s; }
+  </style>
+
+  <script>
+    // State
+    var currentUser = {
+      email: 'kovunov155@gmail.com',
+      username: 'kovunov155-debug',
+      role: 'admin',
+      avatar: '👑'
+    };
+
+    var balances = { ton: 100.00, usdt: 500.00, not: 100000, dogs: 500000, spins: 50 };
+    var currentRot = 0, spinning = false, mult = 1, isMuted = false;
+    var owned = ['cat', 'crown', 'diamond'];
+    var currentAvatar = '👑';
+    
+    // Casino Vault (Bankroll for player payouts)
+    var casinoVault = {
+      ton: 1000.00,
+      usdt: 5000.00,
+      profitTon: 340.50,
+      totalBetsTon: 850.00,
+      totalPayoutsTon: 509.50
+    };
+
+    // House profit algorithm mode (Guaranteed win for casino by default)
+    var profitMode = 'guaranteed_win_casino'; // 'guaranteed_win_casino', 'balanced', 'generous'
+    var rtpMode = 'high'; // legacy
+    
+    var historyData = [
+      { t: 'Депозит в Казну', p: '+1000.00 TON', w: true, time: '12:00:10' },
+      { t: 'Кран (Бонус)', p: '+0.50 TON', w: true, time: '12:05:32' }
+    ];
+
+    var transactionsData = [
+      { id: 'tx-101', type: 'deposit', amount: 1000.00, cur: 'TON', status: 'COMPLETED', dest: 'Казна Казино (Призовой фонд)', time: 'Сегодня, 12:00' },
+      { id: 'tx-102', type: 'withdrawal', amount: 2.50, cur: 'TON', status: 'PENDING', dest: 'UQCKo14mQ1...Tonkeeper', time: '15 минут назад' },
+      { id: 'tx-103', type: 'deposit', amount: 500.00, cur: 'USDT', status: 'COMPLETED', dest: 'TRC-20 Smart Contract', time: 'Вчера, 19:40' }
+    ];
+
+    var prizes = [
+      { t: "ДЖЕКПОТ!", type: "jackpot", i: "🏆", baseTon: 10, baseDogs: 25000 },
+      { t: "0.5 TON", type: "ton", v: 0.5, i: "💎" },
+      { t: "1.0 USDT", type: "usdt", v: 1.0, i: "💵" },
+      { t: "1,000 NOT", type: "not", v: 1000, i: "⚡" },
+      { t: "+3 СПИНА", type: "spins", v: 3, i: "🎁" },
+      { t: "5,000 DOGS", type: "dogs", v: 5000, i: "🐶" },
+      { t: "2.5 TON", type: "ton", v: 2.5, i: "💎" },
+      { t: "5.0 USDT", type: "usdt", v: 5.0, i: "💵" }
+    ];
+
+    // Web Audio Sound Engine
+    var audioCtx = null;
+    function playBeep(f, d, type) {
+      if (isMuted) return;
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx && AC) audioCtx = new AC();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        if (audioCtx) {
+          var osc = audioCtx.createOscillator();
+          var g = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(f || 600, audioCtx.currentTime);
+          g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (d || 0.1));
+          osc.connect(g);
+          g.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + (d || 0.1));
+        }
+      } catch (e) {}
+    }
+
+    function soundWin() {
+      playBeep(523, 0.15, 'triangle');
+      setTimeout(function() { playBeep(659, 0.15, 'triangle'); }, 120);
+      setTimeout(function() { playBeep(784, 0.25, 'triangle'); }, 240);
+    }
+
+    function soundJackpot() {
+      var notes = [523, 659, 784, 1046, 1318];
+      notes.forEach(function(n, i) {
+        setTimeout(function() { playBeep(n, 0.2, 'square'); }, i * 110);
+      });
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      var btn = document.getElementById('soundBtn');
+      if (btn) btn.textContent = isMuted ? '🔇' : '🔊';
+    }
+
+    // UI Updates
+    function updateUI() {
+      var t = document.getElementById('tonBal'); if (t) t.textContent = Number(balances.ton).toFixed(2);
+      var u = document.getElementById('usdtBal'); if (u) u.textContent = Number(balances.usdt).toFixed(2);
+      var n = document.getElementById('notBal'); if (n) n.textContent = Math.round(balances.not).toLocaleString('ru-RU');
+      var d = document.getElementById('dogsBal'); if (d) d.textContent = Math.round(balances.dogs).toLocaleString('ru-RU');
+      var s = document.getElementById('spinsBal'); if (s) s.textContent = balances.spins;
+
+      var ht = document.getElementById('headerTon'); if (ht) ht.textContent = Number(balances.ton).toFixed(2);
+      var ha = document.getElementById('headerAvatar'); if (ha) ha.textContent = currentAvatar;
+
+      var rtpLabel = document.getElementById('adminRtpVal');
+      if (rtpLabel) rtpLabel.textContent = rtpMode === 'high' ? '98% (Щедрый)' : (rtpMode === 'standard' ? '95% (Стандарт)' : '85% (Хардкор)');
+      
+      var vt = document.getElementById('vaultTon'); if (vt) vt.textContent = Number(casinoVault.ton).toFixed(2);
+      var vu = document.getElementById('vaultUsdt'); if (vu) vu.textContent = Number(casinoVault.usdt).toFixed(2);
+      var vp = document.getElementById('vaultProfit'); if (vp) vp.textContent = (casinoVault.profitTon >= 0 ? '+' : '') + Number(casinoVault.profitTon).toFixed(2);
+      
+      var pmBadge = document.getElementById('profitModeBadge');
+      if (pmBadge) {
+        if (profitMode === 'guaranteed_win_casino') {
+          pmBadge.innerHTML = '🛡️ КАЗИНО ВСЕГДА В ПЛЮСЕ (АДМИН ЗАЩИЩЕН)';
+          pmBadge.className = 'px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-black text-xs animate-pulse';
+        } else if (profitMode === 'balanced') {
+          pmBadge.innerHTML = '⚖️ СБАЛАНСИРОВАННЫЙ (92% RTP)';
+          pmBadge.className = 'px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-black text-xs';
+        } else {
+          pmBadge.innerHTML = '🌟 ПРОМО / СТРИМ (98% RTP)';
+          pmBadge.className = 'px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/50 font-black text-xs';
+        }
+      }
+
+      renderAdminWithdrawals();
+      renderTransactions();
+
+      // Save to localStorage
+      try {
+        localStorage.setItem('stickchop_balances', JSON.stringify(balances));
+        localStorage.setItem('stickchop_transactions', JSON.stringify(transactionsData));
+        localStorage.setItem('stickchop_vault', JSON.stringify(casinoVault));
+        localStorage.setItem('stickchop_profit_mode', profitMode);
+      } catch(e) {}
+    }
+
+    // Spin Wheel Logic
+    function spinWheel() {
+      if (spinning) return;
+      if (balances.spins < mult && balances.ton < (mult * 0.2)) {
+        openModal('depositModal');
+        alert('Недостаточно спинов или TON! Пополните баланс.');
+        return;
+      }
+
+      if (balances.spins >= mult) {
+        balances.spins -= mult;
+      } else {
+        balances.ton = Math.max(0, balances.ton - (mult * 0.2));
+      }
+      updateUI();
+
+      spinning = true;
+      var btn = document.getElementById('spinBtn');
+      if (btn) { btn.disabled = true; btn.classList.add('opacity-75'); }
+      var btnMain = document.getElementById('spinBtnMain');
+      if (btnMain) { btnMain.disabled = true; btnMain.classList.add('opacity-75'); }
+
+      // Wheel sector calculation
+      var sectorAngle = 45;
+      var targetIndex = Math.floor(Math.random() * prizes.length);
+
+      // House Profit Guard Logic: Ensure Admin is ALWAYS in profit
+      if (profitMode === 'guaranteed_win_casino') {
+        casinoVault.profitTon += (mult * 0.15);
+        casinoVault.ton += (mult * 0.15);
+        
+        // Block jackpot unless vault has accumulated 150+ TON profit!
+        if (targetIndex === 0) {
+          if (casinoVault.profitTon < (150 * mult)) {
+            var safePool = [1, 3, 4, 5];
+            targetIndex = safePool[Math.floor(Math.random() * safePool.length)];
+          }
+        } else if (targetIndex === 6 || targetIndex === 7) { // 2.5 TON or 5 USDT
+          if (casinoVault.profitTon < (40 * mult)) {
+            targetIndex = 3; // 1,000 NOT
+          }
+        }
+      } else if (rtpMode === 'high' && Math.random() < 0.65) {
+        var goodIndices = [1, 2, 4, 6];
+        targetIndex = goodIndices[Math.floor(Math.random() * goodIndices.length)];
+      }
+
+      var targetMod = (360 - (targetIndex * sectorAngle + (sectorAngle / 2)) + 360) % 360;
+      var currentMod = ((currentRot % 360) + 360) % 360;
+      var delta = (targetMod - currentMod + 360) % 360;
+      var fullRotations = 5 + Math.floor(Math.random() * 3);
+      currentRot += (fullRotations * 360) + delta;
+
+      var w = document.getElementById('wheel');
+      if (w) w.style.transform = 'rotate(' + currentRot + 'deg)';
+
+      // Sound ticks during spin
+      var tickCount = 28;
+      for (var i = 0; i < tickCount; i++) {
+        (function(idx) {
+          var delay = 80 + (idx * idx * 6);
+          if (delay < 4900) {
+            setTimeout(function() { playBeep(700 + (idx * 15), 0.04); }, delay);
+          }
+        })(i);
+      }
+
+      setTimeout(function() {
+        spinning = false;
+        if (btn) { btn.disabled = false; btn.classList.remove('opacity-75'); }
+        var btnMain = document.getElementById('spinBtnMain');
+        if (btnMain) { btnMain.disabled = false; btnMain.classList.remove('opacity-75'); }
+        var prize = prizes[targetIndex];
+        handlePrize(prize);
+      }, 5100);
+    }
+
+    function handlePrize(p) {
+      var winText = '';
+      if (p.type === 'jackpot') {
+        var wonTon = p.baseTon * mult;
+        var wonDogs = p.baseDogs * mult;
+        balances.ton += wonTon;
+        balances.dogs += wonDogs;
+        casinoVault.ton = Math.max(0, casinoVault.ton - wonTon);
+        casinoVault.profitTon -= wonTon;
+        winText = '🏆 МЕГА-ДЖЕКПОТ! +' + wonTon + ' TON и +' + wonDogs.toLocaleString('ru-RU') + ' DOGS!';
+        soundJackpot();
+        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+      } else if (p.type === 'ton') {
+        var wTon = p.v * mult;
+        balances.ton += wTon;
+        casinoVault.ton = Math.max(0, casinoVault.ton - wTon);
+        casinoVault.profitTon -= wTon;
+        winText = '💎 Вы выиграли +' + wTon.toFixed(2) + ' TON!';
+        soundWin();
+        if (typeof confetti === 'function') confetti({ particleCount: 60 });
+      } else if (p.type === 'usdt') {
+        var wUsdt = p.v * mult;
+        balances.usdt += wUsdt;
+        casinoVault.usdt = Math.max(0, casinoVault.usdt - wUsdt);
+        winText = '💵 Вы выиграли +' + wUsdt.toFixed(2) + ' USDT!';
+        soundWin();
+      } else if (p.type === 'not') {
+        var wNot = p.v * mult;
+        balances.not += wNot;
+        winText = '⚡ Вы выиграли +' + wNot.toLocaleString('ru-RU') + ' NOT!';
+        playBeep(800, 0.2);
+      } else if (p.type === 'dogs') {
+        var wDogs = p.v * mult;
+        balances.dogs += wDogs;
+        winText = '🐶 Вы выиграли +' + wDogs.toLocaleString('ru-RU') + ' DOGS!';
+        playBeep(800, 0.2);
+      } else if (p.type === 'spins') {
+        var wSpins = p.v * mult;
+        balances.spins += wSpins;
+        winText = '🎁 Вы получили +' + wSpins + ' бесплатных вращений!';
+        playBeep(900, 0.25);
+      }
+
+      addHist('Колесо Фортуны (x' + mult + ')', winText, true);
+      updateUI();
+      showResult(p.i, p.t, winText);
+    }
+
+    function setMult(m) {
+      mult = m;
+      document.querySelectorAll('.mult-btn').forEach(function(b) {
+        b.classList.remove('mult-act', 'bg-[#1b1b36]');
+        b.classList.add('bg-[#141428]');
+      });
+      var act = document.getElementById('m' + m);
+      if (act) { act.classList.remove('bg-[#141428]'); act.classList.add('mult-act'); }
+      playBeep(500, 0.05);
+    }
+
+    function showSec(name) {
+      var secs = ['spin', 'games', 'shop', 'history', 'admin'];
+      secs.forEach(function(s) {
+        var el = document.getElementById('sec-' + s);
+        if (el) el.classList.add('hidden');
+      });
+      var cur = document.getElementById('sec-' + name);
+      if (cur) cur.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-tab').forEach(function(b) {
+        b.classList.remove('tab-act');
+        b.classList.add('bg-[#141428]');
+      });
+      var btn = document.getElementById('tab-' + name);
+      if (btn) { btn.classList.remove('bg-[#141428]'); btn.classList.add('tab-act'); }
+      playBeep(450, 0.05);
+    }
+
+    // Mini-Games
+    function showGame(gName) {
+      ['slots', 'roulette', 'bj'].forEach(function(g) {
+        var el = document.getElementById('game-' + g);
+        if (el) el.classList.add('hidden');
+      });
+      var cur = document.getElementById('game-' + gName);
+      if (cur) cur.classList.remove('hidden');
+
+      document.querySelectorAll('.game-subtab').forEach(function(b) {
+        b.classList.remove('bg-purple-600', 'text-white');
+        b.classList.add('bg-[#141428]', 'text-gray-400');
+      });
+      var tab = document.getElementById('gtab-' + gName);
+      if (tab) { tab.classList.remove('bg-[#141428]', 'text-gray-400'); tab.classList.add('bg-purple-600', 'text-white'); }
+    }
+
+    // SLOTS
+    var slotBet = 0.5;
+    var slotSymbols = ['👑', '💎', '💵', '⚡', '🐶', '🍒'];
+    var slotMultipliers = { '👑': 25, '💎': 10, '💵': 8, '⚡': 5, '🐶': 4, '🍒': 3 };
+
+    function setSlotBet(amt) {
+      slotBet = amt;
+      var el = document.getElementById('slotsBetVal'); if (el) el.textContent = amt + ' TON';
+    }
+
+    function playSlots() {
+      if (balances.ton < slotBet) {
+        openModal('depositModal');
+        alert('Недостаточно TON для ставки!');
+        return;
+      }
+      balances.ton -= slotBet;
+      updateUI();
+      playBeep(400, 0.1);
+
+      var r1 = document.getElementById('slotR1');
+      var r2 = document.getElementById('slotR2');
+      var r3 = document.getElementById('slotR3');
+
+      var iters = 15;
+      var count = 0;
+      var interval = setInterval(function() {
+        if (r1) r1.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        if (r2) r2.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        if (r3) r3.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        playBeep(600 + (count * 20), 0.03);
+        count++;
+        if (count >= iters) {
+          clearInterval(interval);
+          var s1 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+          var s2 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+          var s3 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+          
+          // House profit guard for slots
+          if (profitMode === 'guaranteed_win_casino') {
+            casinoVault.profitTon += (slotBet * 0.25);
+            casinoVault.ton += (slotBet * 0.25);
+            // Guard against massive drain on low vault profit
+            if (s1 === '👑' && s2 === '👑' && s3 === '👑') {
+              if (casinoVault.profitTon < 150) {
+                s3 = '🍒'; // Near-miss! Crown Crown Cherry -> gives pair win instead
+              }
+            }
+          } else if (rtpMode === 'high' && Math.random() < 0.45) {
+            s2 = s1; s3 = s1;
+          }
+
+          if (r1) r1.textContent = s1;
+          if (r2) r2.textContent = s2;
+          if (r3) r3.textContent = s3;
+
+          if (s1 === s2 && s2 === s3) {
+            var m = slotMultipliers[s1] || 5;
+            var win = slotBet * m;
+            balances.ton += win;
+            casinoVault.ton = Math.max(0, casinoVault.ton - win);
+            casinoVault.profitTon -= win;
+            updateUI();
+            soundJackpot();
+            if (typeof confetti === 'function') confetti({ particleCount: 90 });
+            addHist('Слоты 3x ' + s1, '+' + win.toFixed(2) + ' TON', true);
+            showResult(s1, 'ДЖЕКПОТ В СЛОТАХ!', 'Выпало 3x ' + s1 + '! Выигрыш: +' + win.toFixed(2) + ' TON!');
+          } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+            var matchSym = (s1 === s2) ? s1 : s3;
+            var win2 = slotBet * 1.5;
+            balances.ton += win2;
+            casinoVault.ton = Math.max(0, casinoVault.ton - win2);
+            casinoVault.profitTon -= win2;
+            updateUI();
+            soundWin();
+            addHist('Слоты пара ' + matchSym, '+' + win2.toFixed(2) + ' TON', true);
+            showResult(matchSym, 'Пара символов!', 'Выигрыш: +' + win2.toFixed(2) + ' TON!');
+          } else {
+            addHist('Слоты', '-' + slotBet.toFixed(2) + ' TON', false);
+          }
+        }
+      }, 90);
+    }
+
+    // ROULETTE
+    var rBet = 0.5, rChoice = 'red';
+    function setRBet(amt) {
+      rBet = amt;
+      var el = document.getElementById('rBetVal'); if (el) el.textContent = amt + ' TON';
+    }
+    function setRChoice(choice) {
+      rChoice = choice;
+      document.querySelectorAll('.r-choice-btn').forEach(function(b) { b.classList.remove('ring-4', 'ring-yellow-400'); });
+      var el = document.getElementById('rc-' + choice);
+      if (el) el.classList.add('ring-4', 'ring-yellow-400');
+    }
+    function playRoulette() {
+      if (balances.ton < rBet) { openModal('depositModal'); alert('Недостаточно TON!'); return; }
+      balances.ton -= rBet; updateUI();
+
+      var num = Math.floor(Math.random() * 37); // 0-36
+      var color = (num === 0) ? 'green' : ([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(num) ? 'red' : 'black');
+
+      var el = document.getElementById('rResult');
+      if (el) el.textContent = '...';
+
+      setTimeout(function() {
+        if (el) {
+          el.textContent = num + ' (' + (color === 'green' ? 'ЗЕРО' : (color === 'red' ? 'КРАСНОЕ' : 'ЧЕРНОЕ')) + ')';
+          el.className = 'text-3xl font-black py-4 ' + (color === 'green' ? 'text-emerald-400' : (color === 'red' ? 'text-red-400' : 'text-slate-300'));
+        }
+        var won = false, payout = 0;
+        if (rChoice === color) { won = true; payout = rBet * (color === 'green' ? 36 : 2); }
+        else if (rChoice === 'even' && num !== 0 && num % 2 === 0) { won = true; payout = rBet * 2; }
+        else if (rChoice === 'odd' && num !== 0 && num % 2 !== 0) { won = true; payout = rBet * 2; }
+
+        if (won) {
+          balances.ton += payout; updateUI(); soundWin();
+          addHist('Рулетка (' + rChoice + ')', '+' + payout.toFixed(2) + ' TON', true);
+          showResult('🎡', 'Победа в рулетке!', 'Выпало: ' + num + '. Выигрыш: +' + payout.toFixed(2) + ' TON!');
+        } else {
+          addHist('Рулетка (' + rChoice + ')', '-' + rBet.toFixed(2) + ' TON', false);
+        }
+      }, 1000);
+    }
+
+    // BLACKJACK 21
+    var bjBet = 1.0;
+    var bjDeck = [], pHand = [], dHand = [], bjActive = false;
+    function startBJ() {
+      if (balances.ton < bjBet) { openModal('depositModal'); alert('Недостаточно TON!'); return; }
+      balances.ton -= bjBet; updateUI();
+      bjDeck = [2,3,4,5,6,7,8,9,10,10,10,10,11, 2,3,4,5,6,7,8,9,10,10,10,10,11];
+      bjDeck.sort(function() { return 0.5 - Math.random(); });
+      pHand = [bjDeck.pop(), bjDeck.pop()];
+      dHand = [bjDeck.pop()];
+      bjActive = true;
+      renderBJ();
+      var hBtn = document.getElementById('bjHitBtn'); if (hBtn) hBtn.disabled = false;
+      var sBtn = document.getElementById('bjStandBtn'); if (sBtn) sBtn.disabled = false;
+      var dealBtn = document.getElementById('bjDealBtn'); if (dealBtn) dealBtn.disabled = true;
+    }
+    function getHandSum(h) {
+      var sum = h.reduce(function(a, b) { return a + b; }, 0);
+      var aces = h.filter(function(x) { return x === 11; }).length;
+      while (sum > 21 && aces > 0) { sum -= 10; aces--; }
+      return sum;
+    }
+    function renderBJ() {
+      var pEl = document.getElementById('pCards'); if (pEl) pEl.textContent = pHand.join(' | ') + ' (Сумма: ' + getHandSum(pHand) + ')';
+      var dEl = document.getElementById('dCards'); if (dEl) dEl.textContent = dHand.join(' | ') + ' (Сумма: ' + getHandSum(dHand) + ')';
+    }
+    function hitBJ() {
+      if (!bjActive) return;
+      pHand.push(bjDeck.pop());
+      renderBJ();
+      if (getHandSum(pHand) > 21) { endBJ('Перебор! Вы проиграли.', false); }
+    }
+    function standBJ() {
+      if (!bjActive) return;
+      while (getHandSum(dHand) < 17) { dHand.push(bjDeck.pop()); }
+      renderBJ();
+      var pSum = getHandSum(pHand);
+      var dSum = getHandSum(dHand);
+      if (dSum > 21 || pSum > dSum) {
+        var win = bjBet * 2; balances.ton += win;
+        endBJ('Вы победили! Выигрыш +' + win.toFixed(2) + ' TON', true, win);
+      } else if (pSum === dSum) {
+        balances.ton += bjBet;
+        endBJ('Ничья! Ставка возвращена.', true, bjBet);
+      } else {
+        endBJ('Дилер выиграл.', false);
+      }
+    }
+    function endBJ(msg, won, payout) {
+      bjActive = false; updateUI();
+      var hBtn = document.getElementById('bjHitBtn'); if (hBtn) hBtn.disabled = true;
+      var sBtn = document.getElementById('bjStandBtn'); if (sBtn) sBtn.disabled = true;
+      var dealBtn = document.getElementById('bjDealBtn'); if (dealBtn) dealBtn.disabled = false;
+      addHist('Блэкджек 21', won ? ('+' + (payout || bjBet).toFixed(2) + ' TON') : ('-' + bjBet.toFixed(2) + ' TON'), won);
+      if (won) soundWin();
+      showResult('🃏', won ? 'Победа в 21!' : 'Конец раздачи', msg);
+    }
+
+    // Stickers
+    function buySticker(id, price, cur, em) {
+      var curKey = cur.toLowerCase();
+      if (balances[curKey] < price) return alert('Недостаточно ' + cur + '!');
+      balances[curKey] -= price;
+      owned.push(id);
+      currentAvatar = em;
+      updateUI();
+      soundWin();
+      alert('Стикер успешно куплен и надет в качестве аватара!');
+      renderShop();
+    }
+    function equip(em) {
+      currentAvatar = em;
+      updateUI();
+      alert('Аватар обновлен: ' + em);
+    }
+
+    function renderShop() {
+      var stickers = [
+        { id: 'cat', n: 'Cyber Cat', r: 'COMMON', p: 1000, c: 'NOT', e: '🐱' },
+        { id: 'tree', n: 'Tree of Life', r: 'RARE', p: 1.0, c: 'TON', e: '🌳' },
+        { id: 'diamond', n: 'Diamond Hands', r: 'RARE', p: 5.0, c: 'USDT', e: '💎' },
+        { id: 'crown', n: 'Secret King', r: 'SECRET', p: 5.0, c: 'TON', e: '👑' },
+        { id: 'rocket', n: 'Rocket Moon', r: 'COMMON', p: 5000, c: 'DOGS', e: '🚀' },
+        { id: 'not_lightning', n: 'Lightning Not', r: 'RARE', p: 2500, c: 'NOT', e: '⚡' },
+        { id: 'wolf', n: 'Cyber Wolf', r: 'EPIC', p: 3.5, c: 'TON', e: '🐺' },
+        { id: 'cup', n: 'Golden Cup', r: 'SECRET', p: 25.0, c: 'USDT', e: '🏆' }
+      ];
+
+      var el = document.getElementById('shopGrid'); if (!el) return;
+      el.innerHTML = stickers.map(function(s) {
+        var isOwned = owned.includes(s.id);
+        var rColors = { COMMON: 'border-blue-500/40 text-blue-400', RARE: 'border-purple-500/40 text-purple-400', EPIC: 'border-pink-500/40 text-pink-400', SECRET: 'border-amber-500/50 text-amber-300' };
+        return '<div class="card rounded-2xl p-4 text-center border relative group hover:-translate-y-1 transition duration-200">' +
+          '<div class="text-xs px-2 py-0.5 rounded-full border inline-block mb-2 ' + (rColors[s.r] || 'border-gray-500') + '">' + s.r + '</div>' +
+          '<div class="text-5xl my-3 group-hover:scale-110 transition">' + s.e + '</div>' +
+          '<div class="font-bold text-sm text-white">' + s.n + '</div>' +
+          '<div class="text-xs text-gray-400 font-mono my-2">' + s.p + ' ' + s.c + '</div>' +
+          (isOwned ?
+            '<button onclick="equip(\''+s.e+'\')" class="w-full py-2 rounded-xl bg-purple-600/30 border border-purple-500/50 text-purple-200 font-bold text-xs hover:bg-purple-600/50">Надеть</button>' :
+            '<button onclick="buySticker(\''+s.id+'\','+s.p+',\''+s.c+'\',\''+s.e+'\')" class="w-full py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-xs shadow-md">Купить</button>'
+          ) +
+        '</div>';
+      }).join('');
+    }
+
+    // Transactions History
+    function addHist(title, prize, win) {
+      historyData.unshift({ t: title, p: prize, w: win, time: new Date().toLocaleTimeString('ru-RU') });
+      renderHist();
+    }
+    function renderHist() {
+      var el = document.getElementById('historyList'); if (!el) return;
+      if (historyData.length === 0) { el.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm">Пока нет игровых ставок</div>'; return; }
+      el.innerHTML = historyData.slice(0, 15).map(function(h) {
+        return '<div class="bg-[#121226] border border-[#222244] rounded-xl p-3 flex justify-between items-center text-xs"><div><span class="font-bold text-white">'+h.t+'</span><span class="text-gray-500 ml-2">'+h.time+'</span></div><div class="font-bold font-mono '+(h.w?'text-emerald-400':'text-gray-400')+'">'+h.p+'</div></div>';
+      }).join('');
+    }
+
+    function renderTransactions() {
+      var el = document.getElementById('txList'); if (!el) return;
+      if (transactionsData.length === 0) { el.innerHTML = '<div class="text-center py-6 text-gray-500 text-xs">Нет финансовых транзакций</div>'; return; }
+      el.innerHTML = transactionsData.map(function(tx) {
+        var isDep = tx.type === 'deposit';
+        var statusBadge = tx.status === 'COMPLETED' ? '<span class="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">Зачислено</span>' :
+                          (tx.status === 'PENDING' ? '<span class="text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 animate-pulse">Ожидает вывода</span>' : '<span class="text-red-400 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/30">Отклонено</span>');
+        return '<div class="bg-[#14142a] border border-[#242444] rounded-xl p-3 flex items-center justify-between text-xs">' +
+          '<div class="flex items-center gap-3">' +
+            '<div class="w-8 h-8 rounded-lg ' + (isDep ? 'bg-emerald-500/20 text-emerald-400' : 'bg-cyan-500/20 text-cyan-400') + ' flex items-center justify-center text-base font-bold">' + (isDep ? '↓' : '↑') + '</div>' +
+            '<div>' +
+              '<div class="font-bold text-white">' + (isDep ? 'Пополнение' : 'Вывод средств') + ' ' + tx.amount + ' ' + tx.cur + '</div>' +
+              '<div class="text-[11px] text-gray-400 font-mono">' + tx.dest + ' • ' + tx.time + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div>' + statusBadge + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+    function closeModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+    }
+    function showResult(icon, title, desc) {
+      document.getElementById('mIcon').textContent = icon;
+      document.getElementById('mTitle').textContent = title;
+      document.getElementById('mDesc').textContent = desc;
+      openModal('resultModal');
+    }
+
+    // PAYMENTS / DEPOSIT
+    var depCurrency = 'TON';
+    function setDepCurrency(c) {
+      depCurrency = c;
+      document.querySelectorAll('.dep-tab-btn').forEach(function(b) { b.classList.remove('tab-act'); b.classList.add('bg-[#141428]'); });
+      var active = document.getElementById('deptab-' + c);
+      if (active) { active.classList.remove('bg-[#141428]'); active.classList.add('tab-act'); }
+
+      var addrEl = document.getElementById('depAddr');
+      var qrEl = document.getElementById('depQrCode');
+      var memoEl = document.getElementById('depMemo');
+
+      if (c === 'TON') {
+        if (addrEl) addrEl.textContent = 'EQA_StickChop_Casino_Official_TON_777';
+        if (memoEl) memoEl.textContent = 'STICK-' + Math.floor(100000 + Math.random() * 900000);
+        if (qrEl) qrEl.textContent = '💎 TON QR';
+      } else if (c === 'USDT') {
+        if (addrEl) addrEl.textContent = 'UQDTon_USDT_StickChop_SmartContract_999';
+        if (memoEl) memoEl.textContent = 'USDT-' + Math.floor(100000 + Math.random() * 900000);
+        if (qrEl) qrEl.textContent = '💵 USDT QR';
+      } else if (c === 'CARD') {
+        if (addrEl) addrEl.textContent = '4276 •••• •••• 8892 (МИР / СБП / VISA)';
+        if (memoEl) memoEl.textContent = 'Пополнение картой мгновенно';
+        if (qrEl) qrEl.textContent = '💳 СБП QR';
+      }
+    }
+
+    function confirmDeposit() {
+      var amtInput = document.getElementById('depAmtInput');
+      var amt = parseFloat(amtInput ? amtInput.value : '5') || 5;
+
+      var cur = depCurrency === 'CARD' ? 'TON' : depCurrency;
+      if (cur === 'TON') balances.ton += amt;
+      else if (cur === 'USDT') balances.usdt += amt;
+
+      transactionsData.unshift({
+        id: 'dep-' + Date.now(),
+        type: 'deposit',
+        amount: amt,
+        cur: cur,
+        status: 'COMPLETED',
+        dest: (depCurrency === 'CARD' ? 'Банковская карта' : depCurrency + ' Кошелек'),
+        time: 'Только что'
+      });
+
+      updateUI();
+      soundWin();
+      closeModal('depositModal');
+      if (typeof confetti === 'function') confetti({ particleCount: 75 });
+      showResult('💳', 'Успешное пополнение!', 'Зачислено +' + amt + ' ' + cur + ' на игровой счет!');
+    }
+
+    // WITHDRAWAL / ВЫВОД ДЕНЕГ
+    function submitWithdrawal() {
+      var cur = document.getElementById('wthCurSelect').value;
+      var amt = parseFloat(document.getElementById('wthAmtInput').value) || 0;
+      var dest = document.getElementById('wthDestInput').value.trim();
+
+      if (amt <= 0) return alert('Введите корректную сумму для вывода!');
+      if (!dest || dest.length < 8) return alert('Введите правильный адрес TON кошелька или номер карты!');
+
+      var curKey = cur.toLowerCase();
+      if (balances[curKey] < amt) {
+        return alert('Недостаточно ' + cur + ' для вывода! Ваш баланс: ' + balances[curKey] + ' ' + cur);
+      }
+
+      // Deduct balance and create pending withdrawal
+      balances[curKey] -= amt;
+      
+      var newTx = {
+        id: 'wth-' + Date.now(),
+        type: 'withdrawal',
+        amount: amt,
+        cur: cur,
+        status: 'PENDING',
+        dest: dest,
+        time: 'Только что'
+      };
+
+      transactionsData.unshift(newTx);
+      updateUI();
+      closeModal('withdrawModal');
+      playBeep(650, 0.2);
+
+      showResult('⏳', 'Заявка на вывод создана!', 'Сумма: ' + amt + ' ' + cur + '. Заявка отправлена администратору (kovunov155) на одобрение!');
+    }
+
+    // ADMIN ACTIONS
+    function renderAdminWithdrawals() {
+      var el = document.getElementById('adminPendingList'); if (!el) return;
+      var pending = transactionsData.filter(function(t) { return t.type === 'withdrawal' && t.status === 'PENDING'; });
+      
+      var badgeCount = document.getElementById('adminPendingBadge');
+      if (badgeCount) badgeCount.textContent = pending.length;
+
+      if (pending.length === 0) {
+        el.innerHTML = '<div class="text-center py-6 text-emerald-400 text-xs">✨ Нет активных заявок на вывод. Все выплаты обработаны!</div>';
+        return;
+      }
+
+      el.innerHTML = pending.map(function(p) {
+        return '<div class="bg-[#181834] border border-[#2e2e5c] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">' +
+          '<div>' +
+            '<div class="flex items-center gap-2">' +
+              '<span class="text-amber-400 font-bold text-sm">Вывод: ' + p.amount + ' ' + p.cur + '</span>' +
+              '<span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-mono">ID: ' + p.id + '</span>' +
+            '</div>' +
+            '<div class="text-xs text-gray-300 font-mono mt-1">Реквизиты: <span class="text-cyan-300">' + p.dest + '</span></div>' +
+            '<div class="text-[11px] text-gray-500 mt-0.5">Создано: ' + p.time + '</div>' +
+          '</div>' +
+          '<div class="flex items-center gap-2 w-full sm:w-auto">' +
+            '<button onclick="adminApprovePayout(\''+p.id+'\')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold text-xs shadow-md hover:brightness-110">✅ Одобрить и выплатить</button>' +
+            '<button onclick="adminRejectPayout(\''+p.id+'\')" class="flex-1 sm:flex-none px-3 py-2 rounded-xl bg-red-600/30 border border-red-500/50 text-red-300 font-bold text-xs hover:bg-red-600/50">❌ Отклонить</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function adminApprovePayout(id) {
+      var tx = transactionsData.find(function(t) { return t.id === id; });
+      if (!tx) return;
+      tx.status = 'COMPLETED';
+      tx.txHash = '0xTON_' + Math.random().toString(36).substring(2, 10).toUpperCase();
+      updateUI();
+      soundWin();
+      alert('Заявка ' + id + ' ОДОБРЕНА! Выплата в размере ' + tx.amount + ' ' + tx.cur + ' отправлена на ' + tx.dest + '!');
+    }
+
+    function adminRejectPayout(id) {
+      var tx = transactionsData.find(function(t) { return t.id === id; });
+      if (!tx) return;
+      tx.status = 'REJECTED';
+      // Refund balance to user
+      var curKey = tx.cur.toLowerCase();
+      balances[curKey] += tx.amount;
+      updateUI();
+      alert('Заявка отклонена. ' + tx.amount + ' ' + tx.cur + ' возвращены на баланс пользователя.');
+    }
+
+    function adminAddBonus(amt, cur) {
+      var curKey = cur.toLowerCase();
+      balances[curKey] += amt;
+      updateUI();
+      soundWin();
+      alert('Админ-бонус начислен: +' + amt + ' ' + cur + '!');
+    }
+
+    function adminDepositVault(amt, cur) {
+      if (cur === 'TON') casinoVault.ton += amt;
+      else if (cur === 'USDT') casinoVault.usdt += amt;
+      updateUI();
+      soundWin();
+      if (typeof confetti === 'function') confetti({ particleCount: 60 });
+      alert('🏛️ Казна казино успешно пополнена на +' + amt + ' ' + cur + '!\nТеперь игроки гарантированно получают выигрыши.');
+      try {
+        fetch('/api/admin/vault/deposit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: amt, currency: cur })
+        });
+      } catch(e) {}
+    }
+
+    function adminAirdropPlayer() {
+      var target = document.getElementById('airdropUserSelect').value;
+      var cur = document.getElementById('airdropCurSelect').value;
+      var amt = parseFloat(document.getElementById('airdropAmtInput').value) || 1;
+      
+      if (cur === 'TON' && casinoVault.ton < amt) {
+        return alert('В казне казино недостаточно TON! Сначала пополните казну кнопкой "+100 TON в казну".');
+      }
+      
+      if (cur === 'TON') {
+        casinoVault.ton -= amt;
+        balances.ton += amt;
+      } else if (cur === 'USDT') {
+        casinoVault.usdt -= amt;
+        balances.usdt += amt;
+      } else if (cur === 'SPINS') {
+        balances.spins += Math.round(amt);
+      }
+
+      updateUI();
+      soundWin();
+      if (typeof confetti === 'function') confetti({ particleCount: 75 });
+      alert('🎁 Игроку "' + target + '" успешно начислено +' + amt + ' ' + cur + ' из казны казино!');
+
+      try {
+        fetch('/api/admin/airdrop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUserId: target, amount: amt, currency: cur })
+        });
+      } catch(e) {}
+    }
+
+    function adminAirdropAll() {
+      if (casinoVault.ton < 10) {
+        return alert('В казне казино недостаточно TON для массового дропа! Пополните казну в панели админа.');
+      }
+      casinoVault.ton -= 10;
+      balances.ton += 1.0;
+      balances.spins += 5;
+      updateUI();
+      soundJackpot();
+      if (typeof confetti === 'function') confetti({ particleCount: 120 });
+      alert('🎉 Дроп роздан всем игрокам! Каждый игрок получил +1.0 TON и +5 бесплатных спинов из призового фонда казны.');
+    }
+
+    function setProfitMode(m) {
+      profitMode = m;
+      updateUI();
+      soundWin();
+      var msg = m === 'guaranteed_win_casino' 
+        ? '🛡️ Алгоритм активирован: Казино ВСЕГДА В ПЛЮСЕ!\nКрупные джекпоты выдаются только при наличии накопленной прибыли казны. Вы гарантированно не уйдете в минус.'
+        : (m === 'balanced' ? 'Режим переключен на: Сбалансированный (92% RTP).' : 'Режим переключен на: Промо / Стрим (98% RTP).');
+      alert(msg);
+      try {
+        fetch('/api/admin/profit-mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: m })
+        });
+      } catch(e) {}
+    }
+
+    function setRtpMode(m) {
+      rtpMode = m;
+      updateUI();
+      alert('Режим отдачи (RTP) переключен на: ' + (m === 'high' ? '98% (Щедрый)' : (m === 'standard' ? '95% (Стандарт)' : '85% (Хардкор)')));
+    }
+
+    function claimFaucet() {
+      balances.ton += 0.50; balances.usdt += 2.0; balances.spins += 3; balances.not += 1000;
+      updateUI(); closeModal('faucetModal');
+      soundWin();
+      if (typeof confetti === 'function') confetti({ particleCount: 50 });
+      showResult('🎁', 'Кран активирован!', 'Начислено: +0.5 TON, +2 USDT, +3 Спина, +1,000 NOT!');
+    }
+
+    window.onload = function() {
+      // Load saved state if any
+      try {
+        var savedBal = localStorage.getItem('stickchop_balances');
+        if (savedBal) balances = JSON.parse(savedBal);
+        var savedTxs = localStorage.getItem('stickchop_transactions');
+        if (savedTxs) transactionsData = JSON.parse(savedTxs);
+        var savedVault = localStorage.getItem('stickchop_vault');
+        if (savedVault) casinoVault = JSON.parse(savedVault);
+        var savedMode = localStorage.getItem('stickchop_profit_mode');
+        if (savedMode) profitMode = savedMode;
+        var savedRtp = localStorage.getItem('stickchop_rtp');
+        if (savedRtp) rtpMode = savedRtp;
+      } catch(e) {}
+
+      updateUI();
+      renderShop();
+      renderHist();
+    };
+  </script>
+</head>
+<body class="min-h-screen flex flex-col bg-[#070712] text-slate-100">
+
+  <!-- Running Jackpot Marquee Ticker -->
+  <div class="bg-gradient-to-r from-orange-600 via-pink-600 to-purple-700 py-1.5 px-4 overflow-hidden border-b border-orange-500/40 text-[11px] font-black tracking-wide text-white flex items-center shadow-md">
+    <div class="marquee-inner flex items-center gap-8">
+      <span>🏆 ДЖЕКПОТ НЕДЕЛИ: <strong class="text-yellow-300">50,000 TON</strong></span>
+      <span>⚡ ПОСЛЕДНИЙ ВЫИГРЫШ: <strong class="text-cyan-300">@crypto_boss +12.5 TON в Слотах!</strong></span>
+      <span>👑 АДМИНИСТРАТОР САЙТА: <strong class="text-amber-300">kovunov155-debug (kovunov155@gmail.com)</strong></span>
+      <span>💳 ВЫВОД СРЕДСТВ: <strong class="text-emerald-300">Tonkeeper, Telegram Wallet и Карты МИР</strong></span>
+      <span>🎁 БЕСПЛАТНЫЙ ДЕМО-КРАН: <strong class="text-pink-300">+0.5 TON каждые 30 минут!</strong></span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-[#0c0c1e]/90 backdrop-blur-md border-b border-[#1e1e38] sticky top-0 z-40 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      
+      <!-- Brand & Admin Status -->
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 flex items-center justify-center text-2xl shadow-lg shadow-orange-500/30">
+          🎰
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-black text-lg bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">StickChop Casino</span>
+            <span class="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/50 text-[10px] font-black text-amber-300">👑 АДМИН</span>
+          </div>
+          <div class="text-[10px] font-bold text-gray-400 flex items-center gap-1.5">
+            <span>CRYPTO SPIN & ВЫПЛАТЫ</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions & Balances -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Sound Toggle -->
+        <button id="soundBtn" onclick="toggleMute()" class="p-2.5 rounded-xl bg-[#141428] border border-[#252548] text-emerald-400 text-xs font-bold hover:bg-[#1a1a36] transition" title="Вкл/Выкл Звук">
+          🔊
+        </button>
+
+        <!-- Admin Panel Button -->
+        <button onclick="showSec('admin')" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-purple-500/20 border border-amber-500/60 text-amber-300 text-xs font-black hover:brightness-125 shadow-md">
+          <span>⚙️ Админка</span>
+          <span id="adminPendingBadge" class="bg-amber-400 text-black text-[10px] px-1.5 py-0.2 rounded-full font-black">1</span>
+        </button>
+
+        <!-- Deposit Button -->
+        <button onclick="openModal('depositModal')" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-black hover:brightness-110 shadow-lg shadow-emerald-500/25">
+          <span>💳 Пополнить</span>
+        </button>
+
+        <!-- Withdraw Button -->
+        <button onclick="openModal('withdrawModal')" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#191938] border border-cyan-500/40 text-cyan-300 text-xs font-extrabold hover:bg-cyan-500/10">
+          <span>💸 Вывести</span>
+        </button>
+
+        <!-- Header TON Balance -->
+        <div class="flex items-center gap-1.5 bg-[#14142c] border border-cyan-500/40 px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold">
+          <span>💎</span>
+          <span id="headerTon" class="text-cyan-300 font-mono font-black">15.00</span>
+          <span class="text-gray-400 text-[10px]">TON</span>
+        </div>
+
+        <!-- User Avatar -->
+        <div id="headerAvatar" class="w-10 h-10 rounded-full bg-[#1b1b3a] border-2 border-pink-500/70 flex items-center justify-center text-xl shadow-md">
+          👑
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="py-8 sm:py-12 text-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-purple-900/15 via-transparent to-transparent pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+      
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300 text-xs font-black mb-3 floating-badge">
+        ✨ Официальный Web & Telegram Крипто-Спин • Демо + Выплаты
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-orange-400 via-pink-500 to-purple-400 bg-clip-text text-transparent mb-3 tracking-tight">
+        CRYPTO SPIN
+      </h1>
+
+      <p class="text-gray-300 text-sm sm:text-base max-w-xl mx-auto mb-6">
+        Крутите неоновое колесо фортуны, срывайте джекпоты в слотах, пополняйте баланс и мгновенно выводите выигрыши в TON или на карту!
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-3">
+        <button onclick="showSec('spin')" class="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-slate-950 font-black px-7 py-3 rounded-full text-sm shadow-xl shadow-orange-500/30 hover:scale-105 transition">
+          🎰 Крутить колесо
+        </button>
+        <button onclick="showSec('games')" class="border border-purple-500/60 bg-[#161630] px-6 py-3 rounded-full font-bold text-purple-200 text-sm hover:bg-purple-600/20 transition">
+          🎮 Все 3 мини-игры
+        </button>
+        <button onclick="openModal('depositModal')" class="border border-emerald-500/60 bg-[#102422] px-6 py-3 rounded-full font-bold text-emerald-300 text-sm hover:bg-emerald-500/20 transition">
+          💳 Пополнить счет
+        </button>
+        <button onclick="openModal('withdrawModal')" class="border border-cyan-500/60 bg-[#102030] px-6 py-3 rounded-full font-bold text-cyan-300 text-sm hover:bg-cyan-500/20 transition">
+          💸 Вывести средства
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 pb-20 flex-1 w-full">
+
+    <!-- Live Balances Bar -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
+      
+      <!-- TON -->
+      <div class="card card-glow rounded-2xl p-4 text-center border-cyan-500/30 relative">
+        <div class="text-3xl mb-1">💎</div>
+        <div id="tonBal" class="text-2xl font-black font-mono text-cyan-300">15.00</div>
+        <div class="text-xs text-gray-400 font-bold mb-2">TON COIN</div>
+        <div class="flex gap-1 justify-center">
+          <button onclick="openModal('depositModal')" class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold hover:bg-cyan-500/40">+ Ввод</button>
+          <button onclick="openModal('withdrawModal')" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold hover:bg-emerald-500/40">Вывод</button>
+        </div>
+      </div>
+
+      <!-- USDT -->
+      <div class="card card-glow rounded-2xl p-4 text-center border-emerald-500/30">
+        <div class="text-3xl mb-1">💵</div>
+        <div id="usdtBal" class="text-2xl font-black font-mono text-emerald-300">100.00</div>
+        <div class="text-xs text-gray-400 font-bold mb-2">USDT</div>
+        <button onclick="openModal('depositModal')" class="text-[10px] px-3 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold hover:bg-emerald-500/40">+ Пополнить</button>
+      </div>
+
+      <!-- NOT -->
+      <div class="card card-glow rounded-2xl p-4 text-center border-amber-500/30">
+        <div class="text-3xl mb-1">⚡</div>
+        <div id="notBal" class="text-2xl font-black font-mono text-amber-300">50 000</div>
+        <div class="text-xs text-gray-400 font-bold mb-2">NOTCOIN</div>
+        <button onclick="claimFaucet()" class="text-[10px] px-3 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold hover:bg-amber-500/40">🎁 Кран</button>
+      </div>
+
+      <!-- DOGS -->
+      <div class="card card-glow rounded-2xl p-4 text-center border-purple-500/30">
+        <div class="text-3xl mb-1">🐶</div>
+        <div id="dogsBal" class="text-2xl font-black font-mono text-purple-300">250 000</div>
+        <div class="text-xs text-gray-400 font-bold mb-2">DOGS</div>
+        <button onclick="openModal('faucetModal')" class="text-[10px] px-3 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/40">🎁 Бонус</button>
+      </div>
+
+      <!-- Free Spins -->
+      <div class="card card-glow rounded-2xl p-4 text-center border-pink-500/30 col-span-2 sm:col-span-1">
+        <div class="text-3xl mb-1">🎁</div>
+        <div id="spinsBal" class="text-2xl font-black font-mono text-pink-400">20</div>
+        <div class="text-xs text-gray-400 font-bold mb-2">СПИНЫ</div>
+        <button onclick="openModal('faucetModal')" class="text-[10px] px-3 py-0.5 rounded bg-pink-500/20 text-pink-300 font-bold hover:bg-pink-500/40">+ Получить</button>
+      </div>
+
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 border-b border-[#1b1b36]">
+      <button id="tab-spin" onclick="showSec('spin')" class="nav-tab tab-act px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold whitespace-nowrap transition">
+        🎰 Крипто-Спин
+      </button>
+      <button id="tab-games" onclick="showSec('games')" class="nav-tab bg-[#141428] px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap hover:bg-[#1a1a36] transition">
+        🎮 Мини-игры (3)
+      </button>
+      <button id="tab-shop" onclick="showSec('shop')" class="nav-tab bg-[#141428] px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap hover:bg-[#1a1a36] transition">
+        🛍️ Стикеры NFT
+      </button>
+      <button id="tab-history" onclick="showSec('history')" class="nav-tab bg-[#141428] px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap hover:bg-[#1a1a36] transition">
+        📜 Транзакции & Лог
+      </button>
+      <button id="tab-admin" onclick="showSec('admin')" class="nav-tab bg-gradient-to-r from-amber-500/30 to-purple-600/30 border border-amber-500/60 px-6 py-2.5 rounded-full text-xs sm:text-sm font-black whitespace-nowrap text-amber-300 hover:brightness-125 transition">
+        👑 Админ-панель
+      </button>
+    </div>
+
+    <!-- 1. SECTION: SPIN WHEEL -->
+    <div id="sec-spin" class="card neon-gold rounded-3xl p-6 sm:p-10 mb-8">
+      <div class="flex flex-col lg:flex-row items-center gap-10">
+        
+        <!-- Wheel Visual Container -->
+        <div class="relative w-72 h-72 sm:w-96 sm:h-96 shrink-0">
+          
+          <!-- Top Arrow Pointer -->
+          <div class="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
+            <div class="w-9 h-9 bg-yellow-400 rotate-45 rounded-sm flex items-center justify-center shadow-xl shadow-yellow-400/80 border-2 border-white">
+              <div class="w-3.5 h-3.5 bg-pink-600 rounded-full -rotate-45"></div>
+            </div>
+          </div>
+
+          <!-- Wheel Circle with Lights -->
+          <div id="wheel" class="wheel w-full h-full rounded-full shadow-[0_0_50px_rgba(245,158,11,0.35)] relative select-none border-8 border-yellow-400/60 bg-[#0d0d1f]">
+            
+            <!-- Crisp SVG Wheel (Sectors start at 12 o'clock top = -90deg clockwise) -->
+            <svg class="w-full h-full block" viewBox="0 0 300 300">
+              <defs>
+                <linearGradient id="goldSector" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#fbbf24" />
+                  <stop offset="100%" stop-color="#ea580c" />
+                </linearGradient>
+              </defs>
+              <g transform="translate(150,150)">
+                <!-- Outer Gold Ring -->
+                <circle cx="0" cy="0" r="148" fill="none" stroke="#f59e0b" stroke-width="3" opacity="0.6" />
+
+                <!-- 8 Sectors starting from top (-90deg) going clockwise -->
+                <!-- 0: -90 to -45 -->
+                <path d="M 0 0 L 0 -144 A 144 144 0 0 1 101.82 -101.82 Z" fill="url(#goldSector)" stroke="#fbbf24" stroke-width="1.5" />
+                <!-- 1: -45 to 0 -->
+                <path d="M 0 0 L 101.82 -101.82 A 144 144 0 0 1 144 0 Z" fill="#0e7490" stroke="#22d3ee" stroke-width="1" />
+                <!-- 2: 0 to 45 -->
+                <path d="M 0 0 L 144 0 A 144 144 0 0 1 101.82 101.82 Z" fill="#047857" stroke="#34d399" stroke-width="1" />
+                <!-- 3: 45 to 90 -->
+                <path d="M 0 0 L 101.82 101.82 A 144 144 0 0 1 0 144 Z" fill="#6d28d9" stroke="#a78bfa" stroke-width="1" />
+                <!-- 4: 90 to 135 -->
+                <path d="M 0 0 L 0 144 A 144 144 0 0 1 -101.82 101.82 Z" fill="#be185d" stroke="#f472b6" stroke-width="1" />
+                <!-- 5: 135 to 180 -->
+                <path d="M 0 0 L -101.82 101.82 A 144 144 0 0 1 -144 0 Z" fill="#3730a3" stroke="#818cf8" stroke-width="1" />
+                <!-- 6: 180 to 225 -->
+                <path d="M 0 0 L -144 0 A 144 144 0 0 1 -101.82 -101.82 Z" fill="#0f766e" stroke="#2dd4bf" stroke-width="1" />
+                <!-- 7: 225 to 270 -->
+                <path d="M 0 0 L -101.82 -101.82 A 144 144 0 0 1 0 -144 Z" fill="#9d174d" stroke="#f43f5e" stroke-width="1" />
+
+                <!-- Radially Aligned Labels & Icons -->
+                <g transform="rotate(22.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="22">🏆</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">ДЖЕКПОТ</text>
+                </g>
+                <g transform="rotate(67.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">💎</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">0.5 TON</text>
+                </g>
+                <g transform="rotate(112.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">💵</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">1.0 USDT</text>
+                </g>
+                <g transform="rotate(157.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">⚡</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">1,000 NOT</text>
+                </g>
+                <g transform="rotate(202.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">🎁</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">+3 СПИНА</text>
+                </g>
+                <g transform="rotate(247.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">🐶</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">5k DOGS</text>
+                </g>
+                <g transform="rotate(292.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">💎</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">2.5 TON</text>
+                </g>
+                <g transform="rotate(337.5)">
+                  <text x="0" y="-110" text-anchor="middle" font-size="20">💵</text>
+                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">5.0 USDT</text>
+                </g>
+
+                <!-- Rim LED Bulbs (8 along sector boundaries) -->
+                <circle cx="0" cy="-140" r="4" fill="#fde047" class="bulb" />
+                <circle cx="99" cy="-99" r="4" fill="#fde047" class="bulb" />
+                <circle cx="140" cy="0" r="4" fill="#fde047" class="bulb" />
+                <circle cx="99" cy="99" r="4" fill="#fde047" class="bulb" />
+                <circle cx="0" cy="140" r="4" fill="#fde047" class="bulb" />
+                <circle cx="-99" cy="99" r="4" fill="#fde047" class="bulb" />
+                <circle cx="-140" cy="0" r="4" fill="#fde047" class="bulb" />
+                <circle cx="-99" cy="-99" r="4" fill="#fde047" class="bulb" />
+              </g>
+            </svg>
+
+          </div>
+
+          <!-- Center Spin Button -->
+          <button id="spinBtn" type="button" onclick="spinWheel()" class="cursor-pointer touch-manipulation absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-orange-500 via-pink-600 to-purple-700 rounded-full border-4 border-yellow-400 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(236,72,153,0.8)] hover:scale-105 active:scale-95 transition z-20 group">
+            <span class="text-3xl group-hover:rotate-12 transition">🎰</span>
+            <span class="text-[11px] font-black tracking-wider text-white">SPIN</span>
+          </button>
+
+        </div>
+
+        <!-- Wheel Controls & Information -->
+        <div class="flex-1 text-center lg:text-left space-y-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs font-bold mb-2">
+              ⚡ Мгновенный выигрыш
+            </div>
+            <h2 class="text-2xl sm:text-4xl font-black text-white">
+              Крипто-Колесо Фортуны
+            </h2>
+            <p class="text-sm text-gray-300 mt-1">
+              Выберите множитель ставки и нажмите <strong class="text-orange-400">SPIN</strong>!
+            </p>
+          </div>
+
+          <!-- Multipliers -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Множитель выигрыша:</label>
+            <div class="flex flex-wrap justify-center lg:justify-start gap-2">
+              <button id="m1" type="button" onclick="setMult(1)" class="mult-btn mult-act px-5 py-2.5 rounded-xl border border-orange-500/50 text-xs font-black transition cursor-pointer">x1 (1 спин)</button>
+              <button id="m2" type="button" onclick="setMult(2)" class="mult-btn bg-[#141428] px-5 py-2.5 rounded-xl border border-[#252545] text-xs font-black hover:bg-[#1a1a36] transition cursor-pointer">x2 (2 спина)</button>
+              <button id="m5" type="button" onclick="setMult(5)" class="mult-btn bg-[#141428] px-5 py-2.5 rounded-xl border border-[#252545] text-xs font-black hover:bg-[#1a1a36] transition cursor-pointer">x5 (5 спинов)</button>
+              <button id="m10" type="button" onclick="setMult(10)" class="mult-btn bg-[#141428] px-5 py-2.5 rounded-xl border border-[#252545] text-xs font-black hover:bg-[#1a1a36] transition cursor-pointer">x10 (10 спинов)</button>
+            </div>
+          </div>
+
+          <!-- Primary Spin Action + Quick Actions -->
+          <div class="space-y-3 pt-1">
+            <button id="spinBtnMain" type="button" onclick="spinWheel()" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-orange-500 via-pink-600 to-purple-600 text-white font-black text-base shadow-[0_0_25px_rgba(236,72,153,0.5)] hover:scale-[1.03] active:scale-95 transition cursor-pointer touch-manipulation">
+              🎰 КРУТИТЬ КОЛЕСО ФОРТУНЫ
+            </button>
+            <div class="flex flex-wrap justify-center lg:justify-start gap-3">
+              <button type="button" onclick="openModal('depositModal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-xs shadow-md cursor-pointer">
+                💳 Пополнить для игры
+              </button>
+              <button type="button" onclick="openModal('faucetModal')" class="px-5 py-2.5 rounded-xl bg-[#1c1c38] border border-pink-500/40 text-pink-300 font-extrabold text-xs hover:bg-[#25254a] cursor-pointer">
+                🎁 Бесплатный кран
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. SECTION: 3 MINI-GAMES -->
+    <div id="sec-games" class="hidden space-y-6">
+      
+      <!-- Sub-tabs for Games -->
+      <div class="flex gap-2 border-b border-[#1f1f3a] pb-3">
+        <button id="gtab-slots" onclick="showGame('slots')" class="game-subtab px-5 py-2 rounded-xl bg-purple-600 text-white font-black text-xs">
+          🎰 Неоновые Слоты
+        </button>
+        <button id="gtab-roulette" onclick="showGame('roulette')" class="game-subtab px-5 py-2 rounded-xl bg-[#141428] text-gray-400 font-bold text-xs hover:text-white">
+          🎡 Европейская Рулетка
+        </button>
+        <button id="gtab-bj" onclick="showGame('bj')" class="game-subtab px-5 py-2 rounded-xl bg-[#141428] text-gray-400 font-bold text-xs hover:text-white">
+          🃏 Блэкджек 21
+        </button>
+      </div>
+
+      <!-- Game 1: SLOTS -->
+      <div id="game-slots" class="card rounded-3xl p-6 sm:p-8">
+        <div class="max-w-xl mx-auto text-center space-y-6">
+          <div>
+            <h3 class="text-2xl font-black text-white">🎰 Неоновые Слоты 777</h3>
+            <p class="text-xs text-gray-400">Соберите 3 одинаковых крипто-символа для множителя до x25!</p>
+          </div>
+
+          <!-- Slot Reels Frame -->
+          <div class="bg-[#090914] border-4 border-yellow-500/50 rounded-2xl p-6 shadow-2xl flex justify-center items-center gap-4 sm:gap-8">
+            <div id="slotR1" class="w-20 h-24 sm:w-28 sm:h-32 rounded-xl bg-[#161630] border-2 border-purple-500/40 flex items-center justify-center text-5xl sm:text-6xl shadow-inner">👑</div>
+            <div id="slotR2" class="w-20 h-24 sm:w-28 sm:h-32 rounded-xl bg-[#161630] border-2 border-purple-500/40 flex items-center justify-center text-5xl sm:text-6xl shadow-inner">💎</div>
+            <div id="slotR3" class="w-20 h-24 sm:w-28 sm:h-32 rounded-xl bg-[#161630] border-2 border-purple-500/40 flex items-center justify-center text-5xl sm:text-6xl shadow-inner">⚡</div>
+          </div>
+
+          <!-- Bet Selector -->
+          <div class="flex items-center justify-center gap-3">
+            <span class="text-xs text-gray-400 font-bold">Ставка: <strong id="slotsBetVal" class="text-cyan-300 font-mono">0.5 TON</strong></span>
+            <button onclick="setSlotBet(0.2)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">0.2</button>
+            <button onclick="setSlotBet(0.5)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">0.5</button>
+            <button onclick="setSlotBet(1.0)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">1.0</button>
+            <button onclick="setSlotBet(2.5)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">2.5</button>
+          </div>
+
+          <button onclick="playSlots()" class="w-full max-w-sm py-3.5 rounded-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white font-black text-sm shadow-xl hover:scale-105 transition">
+            ВРАЩАТЬ БАРАБАНЫ
+          </button>
+        </div>
+      </div>
+
+      <!-- Game 2: ROULETTE -->
+      <div id="game-roulette" class="hidden card rounded-3xl p-6 sm:p-8">
+        <div class="max-w-xl mx-auto text-center space-y-6">
+          <div>
+            <h3 class="text-2xl font-black text-white">🎡 Европейская Рулетка</h3>
+            <p class="text-xs text-gray-400">Сделайте ставку на цвет, четное/нечетное или точное число!</p>
+          </div>
+
+          <div id="rResult" class="text-4xl font-black py-4 text-yellow-400 font-mono bg-[#090914] rounded-2xl border border-yellow-500/30">
+            Готов к ставке
+          </div>
+
+          <!-- Bets Options -->
+          <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
+            <button id="rc-red" onclick="setRChoice('red')" class="r-choice-btn py-3 rounded-xl bg-red-600 text-white font-black text-xs ring-4 ring-yellow-400">КРАСНОЕ (x2)</button>
+            <button id="rc-black" onclick="setRChoice('black')" class="r-choice-btn py-3 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-xs">ЧЕРНОЕ (x2)</button>
+            <button id="rc-green" onclick="setRChoice('green')" class="r-choice-btn py-3 rounded-xl bg-emerald-600 text-white font-black text-xs">ЗЕРО (x36)</button>
+            <button id="rc-even" onclick="setRChoice('even')" class="r-choice-btn py-3 rounded-xl bg-[#181836] border border-purple-500/30 text-purple-300 font-black text-xs">ЧЕТНОЕ (x2)</button>
+            <button id="rc-odd" onclick="setRChoice('odd')" class="r-choice-btn py-3 rounded-xl bg-[#181836] border border-purple-500/30 text-purple-300 font-black text-xs">НЕЧЕТНОЕ (x2)</button>
+          </div>
+
+          <div class="flex items-center justify-center gap-3">
+            <span class="text-xs text-gray-400 font-bold">Ставка: <strong id="rBetVal" class="text-cyan-300 font-mono">0.5 TON</strong></span>
+            <button onclick="setRBet(0.5)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">0.5</button>
+            <button onclick="setRBet(1.0)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">1.0</button>
+            <button onclick="setRBet(3.0)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">3.0</button>
+          </div>
+
+          <button onclick="playRoulette()" class="w-full max-w-sm py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white font-black text-sm shadow-xl hover:scale-105 transition">
+            ЗАПУСТИТЬ ШАРИК
+          </button>
+        </div>
+      </div>
+
+      <!-- Game 3: BLACKJACK 21 -->
+      <div id="game-bj" class="hidden card rounded-3xl p-6 sm:p-8">
+        <div class="max-w-xl mx-auto text-center space-y-6">
+          <div>
+            <h3 class="text-2xl font-black text-white">🃏 Блэкджек 21</h3>
+            <p class="text-xs text-gray-400">Наберите очков ближе к 21, чем у дилера, не превышая 21!</p>
+          </div>
+
+          <!-- Hands Display -->
+          <div class="space-y-4">
+            <div class="bg-[#0b0b18] p-4 rounded-2xl border border-[#222244]">
+              <div class="text-xs text-gray-400 font-bold mb-1">Рука Дилера:</div>
+              <div id="dCards" class="text-lg font-mono font-black text-amber-300">Ожидание раздачи</div>
+            </div>
+            <div class="bg-[#0b0b18] p-4 rounded-2xl border border-[#222244]">
+              <div class="text-xs text-gray-400 font-bold mb-1">Ваша Рука:</div>
+              <div id="pCards" class="text-lg font-mono font-black text-emerald-300">Ожидание раздачи</div>
+            </div>
+          </div>
+
+          <div class="flex justify-center gap-3">
+            <button id="bjDealBtn" onclick="startBJ()" class="px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-black text-xs shadow-md">
+              Раздать карты (1 TON)
+            </button>
+            <button id="bjHitBtn" disabled onclick="hitBJ()" class="px-5 py-3 rounded-full bg-purple-600 disabled:opacity-40 text-white font-black text-xs">
+              Взять карту (Hit)
+            </button>
+            <button id="bjStandBtn" disabled onclick="standBJ()" class="px-5 py-3 rounded-full bg-emerald-600 disabled:opacity-40 text-white font-black text-xs">
+              Хватит (Stand)
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. SECTION: STICKER SHOP -->
+    <div id="sec-shop" class="hidden space-y-6">
+      <div class="text-center max-w-xl mx-auto">
+        <h3 class="text-2xl sm:text-3xl font-black text-white">🛍️ Магазин Коллекционных NFT-Стикеров</h3>
+        <p class="text-xs sm:text-sm text-gray-400 mt-1">
+          Покупайте эксклюзивные стикеры за криптовалюту и надевайте их как свой аватар профиля!
+        </p>
+      </div>
+
+      <div id="shopGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- 4. SECTION: HISTORY & TRANSACTIONS -->
+    <div id="sec-history" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Game Rounds History -->
+        <div class="card rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-black text-white text-base">🎰 Игровой лог раундов</h4>
+            <span class="text-xs text-gray-500">Последние 15 игр</span>
+          </div>
+          <div id="historyList" class="space-y-2">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Financial Transactions (Deposits & Withdrawals) -->
+        <div class="card rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-black text-white text-base">💳 Финансовые операции</h4>
+            <span class="text-xs text-gray-500">Пополнения и выводы</span>
+          </div>
+          <div id="txList" class="space-y-2">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 5. SECTION: ADMIN PANEL (Exclusive for kovunov155) -->
+    <div id="sec-admin" class="hidden space-y-6">
+      
+      <!-- Admin Header Card -->
+      <div class="card card-glow rounded-3xl p-6 sm:p-8 border-amber-500/50 bg-gradient-to-br from-[#1c1836] to-[#0c0c1e]">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-3xl shadow-xl shadow-amber-500/30">
+              👑
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-2xl font-black text-white">Панель Администратора</h3>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">ОНЛАЙН</span>
+              </div>
+              <p class="text-xs text-gray-300 mt-0.5">
+                Администратор: <strong class="text-amber-300">kovunov155-debug</strong> (kovunov155@gmail.com)
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button onclick="adminAddBonus(10, 'TON')" class="px-3.5 py-2 rounded-xl bg-cyan-600/30 border border-cyan-500/50 text-cyan-200 text-xs font-black hover:bg-cyan-600/50">
+              +10 TON Админу
+            </button>
+            <button onclick="adminAddBonus(100, 'USDT')" class="px-3.5 py-2 rounded-xl bg-emerald-600/30 border border-emerald-500/50 text-emerald-200 text-xs font-black hover:bg-emerald-600/50">
+              +100 USDT
+            </button>
+            <button onclick="adminAddBonus(50000, 'NOT')" class="px-3.5 py-2 rounded-xl bg-amber-600/30 border border-amber-500/50 text-amber-200 text-xs font-black hover:bg-amber-600/50">
+              +50k NOT
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. Casino Vault (Призовой Фонд Выплат) -->
+      <div class="card card-glow rounded-3xl p-6 sm:p-8 border-cyan-500/40 bg-gradient-to-br from-[#121633] to-[#0a0d24]">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🏛️</span>
+              <h4 class="text-xl font-black text-white">Казна Казино (Призовой Фонд для Игроков)</h4>
+              <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-black">100% ЛИКВИДНОСТЬ</span>
+            </div>
+            <p class="text-xs text-gray-300 mt-1">
+              Внесите средства в казну, чтобы игроки могли выводить реальные выигрыши с сайта
+            </p>
+          </div>
+          <div class="text-xs font-mono bg-cyan-500/10 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-cyan-300">
+            Официальный смарт-контракт выплат
+          </div>
+        </div>
+
+        <!-- Vault Metrics -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div class="bg-[#0b0e26] border border-cyan-500/30 rounded-2xl p-4 text-center">
+            <div class="text-xs text-gray-400 font-bold mb-1">Доступно в Казне для Выплат</div>
+            <div class="text-3xl font-black text-cyan-300 font-mono"><span id="vaultTon">1000.00</span> TON</div>
+            <div class="text-[10px] text-gray-500 mt-1">Резерв на выплаты игрокам</div>
+          </div>
+          <div class="bg-[#0b0e26] border border-emerald-500/30 rounded-2xl p-4 text-center">
+            <div class="text-xs text-gray-400 font-bold mb-1">Резерв Казны в USDT</div>
+            <div class="text-3xl font-black text-emerald-400 font-mono"><span id="vaultUsdt">5000.00</span> USDT</div>
+            <div class="text-[10px] text-gray-500 mt-1">Стейблкоин обеспечение</div>
+          </div>
+          <div class="bg-[#0b0e26] border border-amber-500/30 rounded-2xl p-4 text-center">
+            <div class="text-xs text-gray-400 font-bold mb-1">Чистый Профит Казино</div>
+            <div class="text-3xl font-black text-amber-300 font-mono"><span id="vaultProfit">+340.50</span> TON</div>
+            <div class="text-[10px] text-emerald-400 font-bold mt-1">✓ Администратор в гарантированном плюсе</div>
+          </div>
+        </div>
+
+        <!-- Vault Deposit Buttons for Admin -->
+        <div>
+          <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
+            Внести деньги в казну казино (для выплат выигрышей игрокам):
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="adminDepositVault(100, 'TON')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black text-xs shadow-md hover:brightness-110">
+              💎 +100 TON в Казну
+            </button>
+            <button onclick="adminDepositVault(500, 'TON')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black text-xs shadow-md hover:brightness-110">
+              💎 +500 TON в Казну
+            </button>
+            <button onclick="adminDepositVault(1000, 'TON')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black text-xs shadow-md hover:brightness-110">
+              💎 +1,000 TON в Казну
+            </button>
+            <button onclick="adminDepositVault(5000, 'USDT')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs shadow-md hover:brightness-110">
+              💵 +5,000 USDT в Казну
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Profit Protection Algorithm (Защита Администратора от Минуса) -->
+      <div class="card card-glow rounded-3xl p-6 sm:p-8 border-emerald-500/50 bg-gradient-to-br from-[#0e1d24] to-[#0a1219]">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🛡️</span>
+              <h4 class="text-xl font-black text-white">Алгоритм Защиты Прибыли Казино</h4>
+            </div>
+            <p class="text-xs text-gray-300 mt-1">
+              Математическая защита казны: казино удерживает гарантированную маржу, чтобы вы никогда не были в минусе
+            </p>
+          </div>
+          <span id="profitModeBadge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-black text-xs animate-pulse">
+            🛡️ КАЗИНО ВСЕГДА В ПЛЮСЕ (АДМИН ЗАЩИЩЕН)
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button onclick="setProfitMode('guaranteed_win_casino')" class="p-4 rounded-2xl bg-[#142322] border-2 border-emerald-500/70 hover:brightness-110 text-left transition">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-emerald-300 text-sm">🟢 Казино Всегда в Плюсе</span>
+              <span class="text-[10px] bg-emerald-400 text-black px-1.5 py-0.2 rounded font-black">РЕКОМЕНДУЕТСЯ</span>
+            </div>
+            <p class="text-xs text-gray-300 mt-2">
+              Алгоритм удерживает маржу +25-35%. Джекпоты и крупные выигрыши выдаются только из накопленной прибыли казны. <strong>Вы гарантированно никогда не уходите в минус.</strong>
+            </p>
+          </button>
+
+          <button onclick="setProfitMode('balanced')" class="p-4 rounded-2xl bg-[#121c2c] border border-cyan-500/40 hover:brightness-110 text-left transition">
+            <div class="font-black text-cyan-300 text-sm">🔵 Сбалансированный (92% RTP)</div>
+            <p class="text-xs text-gray-300 mt-2">
+              Классическая математика лицензионных слотов с удержанием комиссии казино 8% с каждого оборота ставок.
+            </p>
+          </button>
+
+          <button onclick="setProfitMode('generous')" class="p-4 rounded-2xl bg-[#1d1430] border border-purple-500/40 hover:brightness-110 text-left transition">
+            <div class="font-black text-purple-300 text-sm">🟣 Промо для Стримов (98% RTP)</div>
+            <p class="text-xs text-gray-300 mt-2">
+              Повышенная отдача и частые фанфары для записи красивых видео, рекламы в соцсетях и привлечения игроков.
+            </p>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Direct Airdrop & Rewards to Players (Раздача Выигрышей Игрокам) -->
+      <div class="card rounded-3xl p-6 sm:p-8 border-purple-500/40 bg-[#12122b]">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🎁</span>
+              <h4 class="text-xl font-black text-white">Прямое Начисление Выигрышей Игрокам</h4>
+            </div>
+            <p class="text-xs text-gray-300 mt-1">
+              Начисляйте выигрыши конкретным пользователям или раздавайте массовые дропы из казны
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">Получатель:</label>
+            <select id="airdropUserSelect" class="w-full bg-[#0a0a1a] border border-[#262650] rounded-xl px-3 py-2 text-white font-bold text-xs outline-none focus:border-purple-500">
+              <option value="CryptoGamer">🐱 CryptoGamer (Игрок #1)</option>
+              <option value="TON_Whale_777">🐋 TON_Whale_777 (Игрок #2)</option>
+              <option value="ALL">🎉 Все зарегистрированные игроки</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">Валюта:</label>
+            <select id="airdropCurSelect" class="w-full bg-[#0a0a1a] border border-[#262650] rounded-xl px-3 py-2 text-white font-bold text-xs outline-none focus:border-purple-500">
+              <option value="TON">💎 TON</option>
+              <option value="USDT">💵 USDT</option>
+              <option value="SPINS">🎁 Бесплатные Спины</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">Сумма / Количество:</label>
+            <input id="airdropAmtInput" type="number" value="2.5" min="0.5" step="0.5" class="w-full bg-[#0a0a1a] border border-[#262650] rounded-xl px-3 py-2 text-white font-mono font-bold text-xs outline-none focus:border-purple-500">
+          </div>
+          <div class="flex items-end">
+            <button onclick="adminAirdropPlayer()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-xs shadow-md hover:brightness-110">
+              Начислить игроку
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-[#25254c] flex flex-wrap items-center justify-between gap-3">
+          <span class="text-xs text-gray-400">Быстрая раздача подарков игрокам из казны:</span>
+          <button onclick="adminAirdropAll()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black text-xs shadow-lg hover:scale-105 transition">
+            🎉 Раздать Дроп всем игрокам (+1.0 TON и +5 Спинов)
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Admin Pending Payouts (Заявки на вывод средств) -->
+      <div class="card rounded-3xl p-6 sm:p-8 border-amber-500/40">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h4 class="text-lg font-black text-white flex items-center gap-2">
+              <span>💸 Заявки на вывод средств</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-mono">Ожидают вашего одобрения</span>
+            </h4>
+            <p class="text-xs text-gray-400">Нажмите «Одобрить», чтобы отправить выплату из казны на кошелек или карту игрока</p>
+          </div>
+        </div>
+
+        <div id="adminPendingList" class="space-y-3">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL: DEPOSIT / ПОПОЛНЕНИЕ СЧЕТА -->
+  <div id="depositModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 sm:p-8 max-w-lg w-full border-emerald-500/40 shadow-2xl relative">
+      <button onclick="closeModal('depositModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-2xl mx-auto mb-2 shadow-lg shadow-emerald-500/30">
+          💳
+        </div>
+        <h3 class="text-2xl font-black text-white">Пополнение Баланса</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Выберите способ пополнения счета</p>
+      </div>
+
+      <!-- Currency Tabs -->
+      <div class="flex gap-2 mb-5">
+        <button id="deptab-TON" onclick="setDepCurrency('TON')" class="dep-tab-btn tab-act flex-1 py-2.5 rounded-xl text-xs font-black">💎 TON</button>
+        <button id="deptab-USDT" onclick="setDepCurrency('USDT')" class="dep-tab-btn bg-[#141428] flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-300">💵 USDT</button>
+        <button id="deptab-CARD" onclick="setDepCurrency('CARD')" class="dep-tab-btn bg-[#141428] flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-300">💳 Карта / СБП</button>
+      </div>
+
+      <!-- Amount Input -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">Сумма пополнения:</label>
+          <div class="flex gap-2">
+            <input id="depAmtInput" type="number" value="5" min="0.5" step="0.5" class="flex-1 bg-[#0b0b18] border border-[#26264c] rounded-xl px-4 py-2.5 text-white font-mono font-bold text-sm outline-none focus:border-emerald-500">
+            <button onclick="document.getElementById('depAmtInput').value = '1'" class="px-3 py-1 bg-[#141428] rounded-lg text-xs font-bold">+1</button>
+            <button onclick="document.getElementById('depAmtInput').value = '5'" class="px-3 py-1 bg-[#141428] rounded-lg text-xs font-bold">+5</button>
+            <button onclick="document.getElementById('depAmtInput').value = '10'" class="px-3 py-1 bg-[#141428] rounded-lg text-xs font-bold">+10</button>
+          </div>
+        </div>
+
+        <!-- Address and QR Preview Box -->
+        <div class="bg-[#0b0b18] border border-[#242448] rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gray-400">Реквизиты для оплаты:</span>
+            <span id="depQrCode" class="text-emerald-400 font-bold">💎 TON QR</span>
+          </div>
+
+          <div class="bg-[#121226] p-2.5 rounded-xl font-mono text-xs text-cyan-300 break-all select-all border border-[#1e1e3a]" id="depAddr">
+            EQA_StickChop_Casino_Official_TON_777
+          </div>
+
+          <div class="flex items-center justify-between text-xs bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
+            <span class="text-amber-300 font-bold">Обязательный MEMO:</span>
+            <span id="depMemo" class="text-amber-200 font-mono font-bold">STICK-782914</span>
+          </div>
+        </div>
+
+        <!-- Confirm Button -->
+        <button onclick="confirmDeposit()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white font-black text-sm shadow-xl hover:brightness-110 transition">
+          ✅ Я ОПЛАТИЛ (ЗАЧИСЛИТЬ НА БАЛАНС)
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WITHDRAWAL / ВЫВОД СРЕДСТВ -->
+  <div id="withdrawModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 sm:p-8 max-w-lg w-full border-cyan-500/40 shadow-2xl relative">
+      <button onclick="closeModal('withdrawModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl mx-auto mb-2 shadow-lg shadow-cyan-500/30">
+          💸
+        </div>
+        <h3 class="text-2xl font-black text-white">Вывод Средств</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Вывод на TON кошелек или банковскую карту</p>
+      </div>
+
+      <div class="space-y-4">
+        
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">Валюта вывода:</label>
+          <select id="wthCurSelect" class="w-full bg-[#0b0b18] border border-[#26264c] rounded-xl px-4 py-2.5 text-white font-bold text-sm outline-none focus:border-cyan-500">
+            <option value="TON">💎 TON (Баланс: 15.00 TON)</option>
+            <option value="USDT">💵 USDT (Баланс: 100.00 USDT)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">Сумма вывода:</label>
+          <input id="wthAmtInput" type="number" value="2.5" min="0.5" step="0.5" class="w-full bg-[#0b0b18] border border-[#26264c] rounded-xl px-4 py-2.5 text-white font-mono font-bold text-sm outline-none focus:border-cyan-500">
+          <div class="flex justify-between text-[11px] text-gray-400 mt-1">
+            <span>Минимум: 0.5 TON</span>
+            <span>Комиссия сети: 0.05 TON</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">Адрес TON кошелька или номер банковской карты:</label>
+          <input id="wthDestInput" type="text" placeholder="UQ... / EQ... или 2200 1234 5678 9012" class="w-full bg-[#0b0b18] border border-[#26264c] rounded-xl px-4 py-2.5 text-white font-mono text-xs outline-none focus:border-cyan-500">
+        </div>
+
+        <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-3 text-xs text-cyan-200">
+          ⚡ Заявка поступит в панель администратора (kovunov155) и будет обработана в течение нескольких минут.
+        </div>
+
+        <button onclick="submitWithdrawal()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-black text-sm shadow-xl hover:brightness-110 transition">
+          ПОДАТЬ ЗАЯВКУ НА ВЫВОД
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RESULT / ПОБЕДА -->
+  <div id="resultModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center border-yellow-500/50 shadow-2xl relative">
+      <div id="mIcon" class="text-6xl mb-3">🏆</div>
+      <h3 id="mTitle" class="text-2xl font-black mb-2 text-white">Выигрыш!</h3>
+      <p id="mDesc" class="text-sm text-gray-300 mb-6 font-semibold"></p>
+      <button onclick="closeModal('resultModal')" class="w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-black text-sm shadow-lg">
+        Отлично!
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: FAUCET / ДЕМО-КРАН -->
+  <div id="faucetModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="card rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center border-pink-500/50 shadow-2xl relative">
+      <div class="text-5xl mb-3">🎁</div>
+      <h3 class="text-2xl font-black mb-1 text-white">Бесплатный Кран</h3>
+      <p class="text-xs text-gray-300 mb-5">
+        Получайте бесплатные монеты и вращения колеса каждые 30 минут без депозита!
+      </p>
+      <div class="bg-[#141428] border border-[#252545] rounded-2xl p-4 mb-5 text-left text-xs space-y-1.5 font-bold">
+        <div class="text-cyan-300">💎 +0.50 TON</div>
+        <div class="text-emerald-300">💵 +2.00 USDT</div>
+        <div class="text-pink-300">🎁 +3 Бесплатных спина</div>
+        <div class="text-amber-300">⚡ +1,000 NOT</div>
+      </div>
+      <button onclick="claimFaucet()" class="w-full py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black text-sm shadow-lg">
+        Забрать бонус
+      </button>
+      <button onclick="closeModal('faucetModal')" class="w-full py-2 mt-2 rounded-full text-xs text-gray-400 font-bold">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
+</body>
+</html>

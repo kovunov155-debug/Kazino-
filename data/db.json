@@ -1,0 +1,65 @@
+{
+  "users": {
+    "admin-1": {
+      "id": "admin-1",
+      "email": "kovunov155@gmail.com",
+      "username": "kovunov155-debug",
+      "role": "admin",
+      "avatar": "👑",
+      "balances": {
+        "ton": 15,
+        "usdt": 100,
+        "not": 50000,
+        "dogs": 250000,
+        "spins": 20
+      },
+      "createdAt": "2026-11-10T12:17:10.627Z"
+    },
+    "guest-1": {
+      "id": "guest-1",
+      "email": "player@ton.org",
+      "username": "CryptoGamer",
+      "role": "user",
+      "avatar": "🐱",
+      "balances": {
+        "ton": 3.5,
+        "usdt": 10,
+        "not": 2000,
+        "dogs": 10000,
+        "spins": 5
+      },
+      "createdAt": "2026-11-10T12:17:10.628Z"
+    }
+  },
+  "transactions": [
+    {
+      "id": "tx-init-1",
+      "userId": "admin-1",
+      "type": "deposit",
+      "currency": "TON",
+      "amount": 15,
+      "status": "COMPLETED",
+      "destination": "EQB...AdminWallet",
+      "txHash": "0x8f2a...c39d",
+      "note": "Стартовый баланс администратора",
+      "createdAt": "2026-11-10T11:17:10.628Z"
+    },
+    {
+      "id": "tx-req-demo",
+      "userId": "guest-1",
+      "type": "withdrawal",
+      "currency": "TON",
+      "amount": 1.5,
+      "status": "PENDING",
+      "destination": "UQCKo14mQ1Vz...TestTonkeeper",
+      "note": "Вывод на Tonkeeper кошелек (ожидает подтверждения)",
+      "createdAt": "2026-11-10T12:07:10.628Z"
+    }
+  ],
+  "settings": {
+    "rtp": "high",
+    "depositTonAddress": "EQA_StickChop_Casino_Deposit_Official_TON_777",
+    "depositUsdtAddress": "UQDTon_USDT_StickChop_SmartContract_999",
+    "maintenance": false
+  }
+}
