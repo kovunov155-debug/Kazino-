@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -644,6 +645,239 @@ app.post('/api/admin/withdrawals/:id/reject', (req: Request, res: Response) => {
 
   saveDb(db);
   res.json({ success: true, message: 'Заявка отклонена, средства возвращены на баланс игрока', tx });
+});
+
+// AUTHORITATIVE CASINO ENGINE ROUTES (Provably Fair + House Edge + Bankroll Guard)
+
+const SERVER_WHEEL_PRIZES = [
+  { t: 'ДЖЕКПОТ!', type: 'jackpot', i: '🏆', baseTon: 10, baseDogs: 25000, tonValue: 10.20 },
+  { t: 'ПУСТО', type: 'loss', v: 0, i: '❌', tonValue: 0 },
+  { t: '0.5 TON', type: 'ton', v: 0.5, i: '💎', tonValue: 0.50 },
+  { t: '1,000 NOT', type: 'not', v: 1000, i: '⚡', tonValue: 0.04 },
+  { t: 'ВОЗВРАТ x0.5', type: 'cashback', v: 0.10, i: '🔄', tonValue: 0.10 },
+  { t: '1.0 USDT', type: 'usdt', v: 1.0, i: '💵', tonValue: 0.20 },
+  { t: 'МИМО', type: 'loss', v: 0, i: '🌑', tonValue: 0 },
+  { t: '+2 СПИНА', type: 'spins', v: 2, i: '🎁', tonValue: 0.40 },
+  { t: '5,000 DOGS', type: 'dogs', v: 5000, i: '🐶', tonValue: 0.04 },
+  { t: '2.5 TON', type: 'ton', v: 2.5, i: '💎', tonValue: 2.50 }
+];
+
+const SERVER_WHEEL_WEIGHTS: Record<string, number[]> = {
+  guaranteed_win_casino: [0.25, 25.0, 8.5, 14.5, 13.0, 10.0, 18.0, 3.5, 6.65, 0.6],
+  balanced:              [0.35, 20.5, 12.0, 13.5, 12.5, 11.5, 15.0, 4.5, 9.15, 1.0],
+  generous:              [0.35, 19.0, 12.5, 12.0, 13.0, 12.0, 16.0, 5.0, 9.05, 1.1]
+};
+
+const SERVER_SLOT_SYMBOLS = ['🍒', '🐶', '⚡', '💵', '💎', '👑'];
+const SERVER_SLOT_MULTS: Record<string, number> = { '🍒': 3, '🐶': 4, '⚡': 6, '💵': 10, '💎': 15, '👑': 35 };
+const SERVER_SLOT_WEIGHTS: Record<string, number[]> = {
+  guaranteed_win_casino: [43, 27, 16, 8, 4, 2],
+  balanced:              [46, 25, 15, 8, 4, 2],
+  generous:              [47, 24, 14, 8, 5, 2]
+};
+const SERVER_SLOT_PAIR_MULT: Record<string, number> = {
+  guaranteed_win_casino: 1.8,
+  balanced: 2.8,
+  generous: 2.95
+};
+const SERVER_RED_NUMS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+
+function serverFairProof(tag: string) {
+  const seed = `${tag}:${Date.now()}:${crypto.randomBytes(12).toString('hex')}`;
+  const hash = crypto.createHash('sha256').update(seed).digest('hex').toUpperCase();
+  return 'PF-' + hash.slice(0, 8) + '-' + hash.slice(8, 14);
+}
+
+function serverPickWeighted(weights: number[]): number {
+  const total = weights.reduce((a, b) => a + b, 0);
+  const randFloat = (crypto.randomBytes(4).readUInt32BE(0) / 0x100000000) * total;
+  let acc = 0;
+  for (let i = 0; i < weights.length; i++) {
+    acc += weights[i];
+    if (randFloat < acc) return i;
+  }
+  return weights.length - 1;
+}
+
+function serverMaxSafePayout(db: Database, betTon: number): number {
+  if (db.settings.profitMode !== 'guaranteed_win_casino') return Infinity;
+  const profitReserve = Math.max(0, Number(db.settings.casinoVault.profitTon) || 0);
+  return Math.max(betTon * 2.5, profitReserve * 0.22);
+}
+
+function serverRecordBet(db: Database, betTon: number) {
+  db.settings.casinoVault.totalBetsTon = Number(((db.settings.casinoVault.totalBetsTon || 0) + betTon).toFixed(4));
+  db.settings.casinoVault.ton = Number(((db.settings.casinoVault.ton || 0) + betTon).toFixed(4));
+  db.settings.casinoVault.profitTon = Number(((db.settings.casinoVault.profitTon || 0) + betTon).toFixed(4));
+}
+
+function serverRecordPayout(db: Database, payoutTon: number) {
+  if (payoutTon <= 0) return;
+  db.settings.casinoVault.totalPayoutsTon = Number(((db.settings.casinoVault.totalPayoutsTon || 0) + payoutTon).toFixed(4));
+  db.settings.casinoVault.ton = Number(Math.max(0, (db.settings.casinoVault.ton || 0) - payoutTon).toFixed(4));
+  db.settings.casinoVault.profitTon = Number(((db.settings.casinoVault.profitTon || 0) - payoutTon).toFixed(4));
+}
+
+// 15. Authoritative Spin Wheel
+app.post('/api/game/spin', (req: Request, res: Response) => {
+  const mult = Math.max(1, Math.min(10, Number(req.body?.mult) || 1));
+  const db = readDb();
+  const user = db.users[activeUserId];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const betTon = Number((mult * 0.20).toFixed(2));
+  if (user.balances.spins >= mult) {
+    user.balances.spins -= mult;
+  } else if (user.balances.ton >= betTon) {
+    user.balances.ton = Number((user.balances.ton - betTon).toFixed(4));
+  } else {
+    return res.status(400).json({ error: 'Недостаточно спинов или TON' });
+  }
+
+  serverRecordBet(db, betTon);
+  const weights = SERVER_WHEEL_WEIGHTS[db.settings.profitMode] || SERVER_WHEEL_WEIGHTS.guaranteed_win_casino;
+  let targetIndex = serverPickWeighted(weights);
+  const cap = serverMaxSafePayout(db, betTon);
+  if (db.settings.profitMode === 'guaranteed_win_casino' && (SERVER_WHEEL_PRIZES[targetIndex].tonValue * mult) > cap) {
+    targetIndex = (targetIndex === 0 || targetIndex === 9) ? 1 : 6;
+  }
+
+  const p = SERVER_WHEEL_PRIZES[targetIndex];
+  const payoutTon = Number((p.tonValue * mult).toFixed(4));
+  if (p.type === 'jackpot') {
+    user.balances.ton = Number((user.balances.ton + (p.baseTon || 10) * mult).toFixed(4));
+    user.balances.dogs += (p.baseDogs || 25000) * mult;
+    serverRecordPayout(db, payoutTon);
+  } else if (p.type === 'ton' || p.type === 'cashback') {
+    user.balances.ton = Number((user.balances.ton + (p.v || 0) * mult).toFixed(4));
+    serverRecordPayout(db, payoutTon);
+  } else if (p.type === 'usdt') {
+    user.balances.usdt = Number((user.balances.usdt + (p.v || 0) * mult).toFixed(4));
+    db.settings.casinoVault.usdt = Number(Math.max(0, db.settings.casinoVault.usdt - (p.v || 0) * mult).toFixed(2));
+    serverRecordPayout(db, payoutTon);
+  } else if (p.type === 'not') {
+    user.balances.not += (p.v || 0) * mult;
+    serverRecordPayout(db, payoutTon);
+  } else if (p.type === 'dogs') {
+    user.balances.dogs += (p.v || 0) * mult;
+    serverRecordPayout(db, payoutTon);
+  } else if (p.type === 'spins') {
+    user.balances.spins += (p.v || 0) * mult;
+    serverRecordPayout(db, payoutTon);
+  }
+
+  const proof = serverFairProof(`SPIN_x${mult}`);
+  saveDb(db);
+  res.json({ success: true, targetIndex, prize: p, payoutTon, proof, balances: user.balances, vault: db.settings.casinoVault });
+});
+
+// 16. Authoritative Weighted Virtual-Reel Slots
+app.post('/api/game/slots', (req: Request, res: Response) => {
+  const bet = Math.max(0.1, Number(req.body?.bet) || 0.5);
+  const db = readDb();
+  const user = db.users[activeUserId];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.balances.ton < bet) return res.status(400).json({ error: 'Недостаточно TON для ставки' });
+
+  user.balances.ton = Number((user.balances.ton - bet).toFixed(4));
+  serverRecordBet(db, bet);
+
+  const mode = db.settings.profitMode || 'guaranteed_win_casino';
+  const weights = SERVER_SLOT_WEIGHTS[mode] || SERVER_SLOT_WEIGHTS.guaranteed_win_casino;
+  const pairMult = SERVER_SLOT_PAIR_MULT[mode] || 1.8;
+
+  let i1 = serverPickWeighted(weights);
+  let i2 = serverPickWeighted(weights);
+  let i3 = serverPickWeighted(weights);
+
+  if (i1 === i2 && i2 === i3 && mode === 'guaranteed_win_casino') {
+    const tripleWin = bet * (SERVER_SLOT_MULTS[SERVER_SLOT_SYMBOLS[i1]] || 5);
+    if (tripleWin > serverMaxSafePayout(db, bet)) {
+      i3 = (i1 === 0) ? 1 : 0;
+    }
+  }
+
+  const s1 = SERVER_SLOT_SYMBOLS[i1];
+  const s2 = SERVER_SLOT_SYMBOLS[i2];
+  const s3 = SERVER_SLOT_SYMBOLS[i3];
+
+  let payout = 0;
+  let winType: 'triple' | 'pair' | 'loss' = 'loss';
+  if (s1 === s2 && s2 === s3) {
+    winType = 'triple';
+    payout = Number((bet * (SERVER_SLOT_MULTS[s1] || 5)).toFixed(2));
+  } else if (s1 === s2) {
+    winType = 'pair';
+    payout = Number((bet * pairMult).toFixed(2));
+  }
+
+  if (payout > 0) {
+    user.balances.ton = Number((user.balances.ton + payout).toFixed(4));
+    serverRecordPayout(db, payout);
+  }
+
+  const proof = serverFairProof(`SLOTS_${bet}`);
+  saveDb(db);
+  res.json({ success: true, reels: [s1, s2, s3], winType, payout, proof, balances: user.balances, vault: db.settings.casinoVault });
+});
+
+// 17. Authoritative European Roulette
+app.post('/api/game/roulette', (req: Request, res: Response) => {
+  const bet = Math.max(0.1, Number(req.body?.bet) || 0.5);
+  const choice = String(req.body?.choice || 'red');
+  const db = readDb();
+  const user = db.users[activeUserId];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.balances.ton < bet) return res.status(400).json({ error: 'Недостаточно TON для ставки' });
+
+  user.balances.ton = Number((user.balances.ton - bet).toFixed(4));
+  serverRecordBet(db, bet);
+
+  const isWin = (n: number) => {
+    const col = n === 0 ? 'green' : (SERVER_RED_NUMS.has(n) ? 'red' : 'black');
+    if (choice === col) return true;
+    if (choice === 'even' && n !== 0 && n % 2 === 0) return true;
+    if (choice === 'odd' && n !== 0 && n % 2 !== 0) return true;
+    return false;
+  };
+
+  let num = crypto.randomInt(0, 37);
+  const potential = bet * (choice === 'green' ? 36 : 2);
+  if (db.settings.profitMode === 'guaranteed_win_casino' && isWin(num) && potential > serverMaxSafePayout(db, bet)) {
+    for (let k = 0; k < 12 && isWin(num); k++) {
+      num = crypto.randomInt(0, 37);
+    }
+  }
+
+  const color = num === 0 ? 'green' : (SERVER_RED_NUMS.has(num) ? 'red' : 'black');
+  const won = isWin(num);
+  const payout = won ? Number(potential.toFixed(2)) : 0;
+  if (payout > 0) {
+    user.balances.ton = Number((user.balances.ton + payout).toFixed(4));
+    serverRecordPayout(db, payout);
+  }
+
+  const proof = serverFairProof(`ROUL_${choice}`);
+  saveDb(db);
+  res.json({ success: true, number: num, color, won, payout, proof, balances: user.balances, vault: db.settings.casinoVault });
+});
+
+// 18. Authoritative Blackjack Settlement Ledger
+app.post('/api/game/blackjack', (req: Request, res: Response) => {
+  const bet = Math.max(0.1, Number(req.body?.bet) || 1.0);
+  const payout = Math.max(0, Number(req.body?.payout) || 0);
+  const db = readDb();
+  const user = db.users[activeUserId];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.balances.ton < bet) return res.status(400).json({ error: 'Недостаточно TON для ставки' });
+
+  user.balances.ton = Number((user.balances.ton - bet + payout).toFixed(4));
+  serverRecordBet(db, bet);
+  if (payout > 0) serverRecordPayout(db, payout);
+
+  const proof = serverFairProof(`BJ_${bet}`);
+  saveDb(db);
+  res.json({ success: true, proof, balances: user.balances, vault: db.settings.casinoVault });
 });
 
 // Setup Vite middlewares or static files

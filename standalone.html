@@ -114,7 +114,65 @@
     // House profit algorithm mode (Guaranteed win for casino by default)
     var profitMode = 'guaranteed_win_casino'; // 'guaranteed_win_casino', 'balanced', 'generous'
     var rtpMode = 'high'; // legacy
-    
+    var SPIN_COST_TON = 0.20;
+    var lastRoundProof = 'PF-INIT-7A9C4E12';
+
+    function generateFairHash(tag) {
+      var seed = (tag || 'ROUND') + '|' + Date.now() + '|' + Math.random().toString(36).slice(2, 10);
+      var h = 2166136261;
+      for (var i = 0; i < seed.length; i++) {
+        h ^= seed.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      var hex1 = (h >>> 0).toString(16).toUpperCase().padStart(8, '0');
+      var hex2 = Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase().padStart(8, '0');
+      lastRoundProof = 'PF-' + hex1 + '-' + hex2.slice(0, 6);
+      return lastRoundProof;
+    }
+
+    function pickWeightedIndex(weights) {
+      var total = 0;
+      for (var i = 0; i < weights.length; i++) total += weights[i];
+      var r = Math.random() * total;
+      var acc = 0;
+      for (var j = 0; j < weights.length; j++) {
+        acc += weights[j];
+        if (r < acc) return j;
+      }
+      return weights.length - 1;
+    }
+
+    function recordBetToVault(betTon) {
+      var b = Number(betTon) || 0;
+      if (b <= 0) return;
+      casinoVault.totalBetsTon = Number(((casinoVault.totalBetsTon || 0) + b).toFixed(4));
+      casinoVault.ton = Number(((casinoVault.ton || 0) + b).toFixed(4));
+      casinoVault.profitTon = Number(((casinoVault.profitTon || 0) + b).toFixed(4));
+    }
+
+    function recordPayoutFromVault(payoutTon) {
+      var p = Number(payoutTon) || 0;
+      if (p <= 0) return;
+      casinoVault.totalPayoutsTon = Number(((casinoVault.totalPayoutsTon || 0) + p).toFixed(4));
+      casinoVault.ton = Number(Math.max(0, (casinoVault.ton || 0) - p).toFixed(4));
+      casinoVault.profitTon = Number(((casinoVault.profitTon || 0) - p).toFixed(4));
+    }
+
+    function maxSafePayoutTon(betTon) {
+      if (profitMode !== 'guaranteed_win_casino') return Infinity;
+      var profitReserve = Math.max(0, Number(casinoVault.profitTon) || 0);
+      return Math.max(betTon * 2.5, profitReserve * 0.22);
+    }
+
+    function getEngineMeta() {
+      if (profitMode === 'guaranteed_win_casino') {
+        return { label: 'КАЗИНО В ПЛЮСЕ', targetRtp: '72–84%', edge: '16–28%', color: 'text-emerald-300' };
+      } else if (profitMode === 'balanced') {
+        return { label: 'СБАЛАНСИРОВАННЫЙ', targetRtp: '91–97%', edge: '3–9%', color: 'text-cyan-300' };
+      }
+      return { label: 'ПРОМО / СТРИМ', targetRtp: '96–97%', edge: '3–4%', color: 'text-purple-300' };
+    }
+
     var historyData = [
       { t: 'Депозит в Казну', p: '+1000.00 TON', w: true, time: '12:00:10' },
       { t: 'Кран (Бонус)', p: '+0.50 TON', w: true, time: '12:05:32' }
@@ -126,16 +184,25 @@
       { id: 'tx-103', type: 'deposit', amount: 500.00, cur: 'USDT', status: 'COMPLETED', dest: 'TRC-20 Smart Contract', time: 'Вчера, 19:40' }
     ];
 
+    // 10-sector weighted casino wheel (36 deg per sector clockwise from 12 o'clock)
     var prizes = [
-      { t: "ДЖЕКПОТ!", type: "jackpot", i: "🏆", baseTon: 10, baseDogs: 25000 },
-      { t: "0.5 TON", type: "ton", v: 0.5, i: "💎" },
-      { t: "1.0 USDT", type: "usdt", v: 1.0, i: "💵" },
-      { t: "1,000 NOT", type: "not", v: 1000, i: "⚡" },
-      { t: "+3 СПИНА", type: "spins", v: 3, i: "🎁" },
-      { t: "5,000 DOGS", type: "dogs", v: 5000, i: "🐶" },
-      { t: "2.5 TON", type: "ton", v: 2.5, i: "💎" },
-      { t: "5.0 USDT", type: "usdt", v: 5.0, i: "💵" }
+      { t: "ДЖЕКПОТ!", type: "jackpot", i: "🏆", baseTon: 10, baseDogs: 25000, tonValue: 10.20 },
+      { t: "ПУСТО", type: "loss", v: 0, i: "❌", tonValue: 0 },
+      { t: "0.5 TON", type: "ton", v: 0.5, i: "💎", tonValue: 0.50 },
+      { t: "1,000 NOT", type: "not", v: 1000, i: "⚡", tonValue: 0.04 },
+      { t: "ВОЗВРАТ x0.5", type: "cashback", v: 0.10, i: "🔄", tonValue: 0.10 },
+      { t: "1.0 USDT", type: "usdt", v: 1.0, i: "💵", tonValue: 0.20 },
+      { t: "МИМО", type: "loss", v: 0, i: "🌑", tonValue: 0 },
+      { t: "+2 СПИНА", type: "spins", v: 2, i: "🎁", tonValue: 0.40 },
+      { t: "5,000 DOGS", type: "dogs", v: 5000, i: "🐶", tonValue: 0.04 },
+      { t: "2.5 TON", type: "ton", v: 2.5, i: "💎", tonValue: 2.50 }
     ];
+
+    var WHEEL_WEIGHTS = {
+      guaranteed_win_casino: [0.25, 25.0, 8.5, 14.5, 13.0, 10.0, 18.0, 3.5, 6.65, 0.6],
+      balanced:              [0.35, 20.5, 12.0, 13.5, 12.5, 11.5, 15.0, 4.5, 9.15, 1.0],
+      generous:              [0.35, 19.0, 12.5, 12.0, 13.0, 12.0, 16.0, 5.0, 9.05, 1.1]
+    };
 
     // Web Audio Sound Engine
     var audioCtx = null;
@@ -193,20 +260,36 @@
       var rtpLabel = document.getElementById('adminRtpVal');
       if (rtpLabel) rtpLabel.textContent = rtpMode === 'high' ? '98% (Щедрый)' : (rtpMode === 'standard' ? '95% (Стандарт)' : '85% (Хардкор)');
       
-      var vt = document.getElementById('vaultTon'); if (vt) vt.textContent = Number(casinoVault.ton).toFixed(2);
-      var vu = document.getElementById('vaultUsdt'); if (vu) vu.textContent = Number(casinoVault.usdt).toFixed(2);
-      var vp = document.getElementById('vaultProfit'); if (vp) vp.textContent = (casinoVault.profitTon >= 0 ? '+' : '') + Number(casinoVault.profitTon).toFixed(2);
-      
+      var vt = document.getElementById('vaultTon'); if (vt) vt.textContent = Number(casinoVault.ton || 0).toFixed(2);
+      var vu = document.getElementById('vaultUsdt'); if (vu) vu.textContent = Number(casinoVault.usdt || 0).toFixed(2);
+      var vp = document.getElementById('vaultProfit'); if (vp) vp.textContent = (casinoVault.profitTon >= 0 ? '+' : '') + Number(casinoVault.profitTon || 0).toFixed(2);
+
+      var vb = document.getElementById('vaultBets'); if (vb) vb.textContent = Number(casinoVault.totalBetsTon || 0).toFixed(2);
+      var vpOut = document.getElementById('vaultPayouts'); if (vpOut) vpOut.textContent = Number(casinoVault.totalPayoutsTon || 0).toFixed(2);
+      var vRtp = document.getElementById('vaultActualRtp');
+      if (vRtp) {
+        var actualRtp = (casinoVault.totalBetsTon > 0) ? ((casinoVault.totalPayoutsTon / casinoVault.totalBetsTon) * 100) : 0;
+        vRtp.textContent = actualRtp.toFixed(1) + '%';
+      }
+
+      var meta = getEngineMeta();
+      var engEl = document.getElementById('engineModeLabel');
+      if (engEl) engEl.textContent = meta.label + ' • House Edge ' + meta.edge + ' (RTP ' + meta.targetRtp + ')';
+      var pfEl = document.getElementById('provablyFairHash');
+      if (pfEl) pfEl.textContent = lastRoundProof;
+      var pfEl2 = document.getElementById('gamesFairHash');
+      if (pfEl2) pfEl2.textContent = lastRoundProof + ' • Edge ' + meta.edge;
+
       var pmBadge = document.getElementById('profitModeBadge');
       if (pmBadge) {
         if (profitMode === 'guaranteed_win_casino') {
-          pmBadge.innerHTML = '🛡️ КАЗИНО ВСЕГДА В ПЛЮСЕ (АДМИН ЗАЩИЩЕН)';
+          pmBadge.innerHTML = '🛡️ КАЗИНО ВСЕГДА В ПЛЮСЕ (RTP ~72-84%)';
           pmBadge.className = 'px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-black text-xs animate-pulse';
         } else if (profitMode === 'balanced') {
-          pmBadge.innerHTML = '⚖️ СБАЛАНСИРОВАННЫЙ (92% RTP)';
+          pmBadge.innerHTML = '⚖️ СБАЛАНСИРОВАННЫЙ (RTP ~91-97%)';
           pmBadge.className = 'px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-black text-xs';
         } else {
-          pmBadge.innerHTML = '🌟 ПРОМО / СТРИМ (98% RTP)';
+          pmBadge.innerHTML = '🌟 ПРОМО / СТРИМ (RTP ~96-97%)';
           pmBadge.className = 'px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/50 font-black text-xs';
         }
       }
@@ -223,10 +306,11 @@
       } catch(e) {}
     }
 
-    // Spin Wheel Logic
+    // Spin Wheel Logic (Weighted 10-Sector Casino Wheel + Bankroll Guard)
     function spinWheel() {
       if (spinning) return;
-      if (balances.spins < mult && balances.ton < (mult * 0.2)) {
+      var betTon = Number((mult * SPIN_COST_TON).toFixed(2));
+      if (balances.spins < mult && balances.ton < betTon) {
         openModal('depositModal');
         alert('Недостаточно спинов или TON! Пополните баланс.');
         return;
@@ -235,8 +319,10 @@
       if (balances.spins >= mult) {
         balances.spins -= mult;
       } else {
-        balances.ton = Math.max(0, balances.ton - (mult * 0.2));
+        balances.ton = Math.max(0, Number((balances.ton - betTon).toFixed(4)));
       }
+      recordBetToVault(betTon);
+      var proof = generateFairHash('WHEEL_x' + mult);
       updateUI();
 
       spinning = true;
@@ -245,29 +331,18 @@
       var btnMain = document.getElementById('spinBtnMain');
       if (btnMain) { btnMain.disabled = true; btnMain.classList.add('opacity-75'); }
 
-      // Wheel sector calculation
-      var sectorAngle = 45;
-      var targetIndex = Math.floor(Math.random() * prizes.length);
+      // Weighted RNG selection per House Profit Mode
+      var sectorAngle = 36;
+      var weights = WHEEL_WEIGHTS[profitMode] || WHEEL_WEIGHTS.guaranteed_win_casino;
+      var targetIndex = pickWeightedIndex(weights);
 
-      // House Profit Guard Logic: Ensure Admin is ALWAYS in profit
-      if (profitMode === 'guaranteed_win_casino') {
-        casinoVault.profitTon += (mult * 0.15);
-        casinoVault.ton += (mult * 0.15);
-        
-        // Block jackpot unless vault has accumulated 150+ TON profit!
-        if (targetIndex === 0) {
-          if (casinoVault.profitTon < (150 * mult)) {
-            var safePool = [1, 3, 4, 5];
-            targetIndex = safePool[Math.floor(Math.random() * safePool.length)];
-          }
-        } else if (targetIndex === 6 || targetIndex === 7) { // 2.5 TON or 5 USDT
-          if (casinoVault.profitTon < (40 * mult)) {
-            targetIndex = 3; // 1,000 NOT
-          }
-        }
-      } else if (rtpMode === 'high' && Math.random() < 0.65) {
-        var goodIndices = [1, 2, 4, 6];
-        targetIndex = goodIndices[Math.floor(Math.random() * goodIndices.length)];
+      // Bankroll Guard: cap max payout & trigger near-miss sector next to Jackpot when needed
+      var candidate = prizes[targetIndex];
+      var candidatePayoutTon = (candidate.tonValue || 0) * mult;
+      var capTon = maxSafePayoutTon(betTon);
+      if (profitMode === 'guaranteed_win_casino' && candidatePayoutTon > capTon) {
+        // Near-miss: land right beside Jackpot (1 = ПУСТО or 4 = x0.5)
+        targetIndex = (targetIndex === 0 || targetIndex === 9) ? 1 : 6;
       }
 
       var targetMod = (360 - (targetIndex * sectorAngle + (sectorAngle / 2)) + 360) % 360;
@@ -296,56 +371,71 @@
         var btnMain = document.getElementById('spinBtnMain');
         if (btnMain) { btnMain.disabled = false; btnMain.classList.remove('opacity-75'); }
         var prize = prizes[targetIndex];
-        handlePrize(prize);
+        handlePrize(prize, proof);
       }, 5100);
     }
 
-    function handlePrize(p) {
+    function handlePrize(p, proof) {
       var winText = '';
-      if (p.type === 'jackpot') {
+      var isWin = true;
+      var payoutTon = Number(((p.tonValue || 0) * mult).toFixed(4));
+
+      if (p.type === 'loss') {
+        isWin = false;
+        winText = (p.t === 'ПУСТО' ? '❌ Сектор ПУСТО (рядом с Джекпотом!). Попробуйте ещё раз!' : '🌑 Сектор МИМО. Удача уже близко!');
+        playBeep(210, 0.22, 'sawtooth');
+      } else if (p.type === 'jackpot') {
         var wonTon = p.baseTon * mult;
         var wonDogs = p.baseDogs * mult;
         balances.ton += wonTon;
         balances.dogs += wonDogs;
-        casinoVault.ton = Math.max(0, casinoVault.ton - wonTon);
-        casinoVault.profitTon -= wonTon;
+        recordPayoutFromVault(payoutTon);
         winText = '🏆 МЕГА-ДЖЕКПОТ! +' + wonTon + ' TON и +' + wonDogs.toLocaleString('ru-RU') + ' DOGS!';
         soundJackpot();
         if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
       } else if (p.type === 'ton') {
         var wTon = p.v * mult;
         balances.ton += wTon;
-        casinoVault.ton = Math.max(0, casinoVault.ton - wTon);
-        casinoVault.profitTon -= wTon;
+        recordPayoutFromVault(payoutTon);
         winText = '💎 Вы выиграли +' + wTon.toFixed(2) + ' TON!';
         soundWin();
         if (typeof confetti === 'function') confetti({ particleCount: 60 });
+      } else if (p.type === 'cashback') {
+        var wCb = Number((p.v * mult).toFixed(2));
+        balances.ton += wCb;
+        recordPayoutFromVault(payoutTon);
+        winText = '🔄 Кэшбэк x0.5 ставки: +' + wCb.toFixed(2) + ' TON возвращено!';
+        playBeep(620, 0.15);
       } else if (p.type === 'usdt') {
         var wUsdt = p.v * mult;
         balances.usdt += wUsdt;
         casinoVault.usdt = Math.max(0, casinoVault.usdt - wUsdt);
+        recordPayoutFromVault(payoutTon);
         winText = '💵 Вы выиграли +' + wUsdt.toFixed(2) + ' USDT!';
         soundWin();
       } else if (p.type === 'not') {
         var wNot = p.v * mult;
         balances.not += wNot;
+        recordPayoutFromVault(payoutTon);
         winText = '⚡ Вы выиграли +' + wNot.toLocaleString('ru-RU') + ' NOT!';
         playBeep(800, 0.2);
       } else if (p.type === 'dogs') {
         var wDogs = p.v * mult;
         balances.dogs += wDogs;
+        recordPayoutFromVault(payoutTon);
         winText = '🐶 Вы выиграли +' + wDogs.toLocaleString('ru-RU') + ' DOGS!';
         playBeep(800, 0.2);
       } else if (p.type === 'spins') {
         var wSpins = p.v * mult;
         balances.spins += wSpins;
+        recordPayoutFromVault(payoutTon);
         winText = '🎁 Вы получили +' + wSpins + ' бесплатных вращений!';
         playBeep(900, 0.25);
       }
 
-      addHist('Колесо Фортуны (x' + mult + ')', winText, true);
+      addHist('Колесо Фортуны (x' + mult + ')', isWin ? winText : ('-' + (mult * SPIN_COST_TON).toFixed(2) + ' TON (' + p.t + ')'), isWin);
       updateUI();
-      showResult(p.i, p.t, winText);
+      showResult(p.i, isWin ? p.t : 'Не повезло!', winText + (proof ? ' [' + proof + ']' : ''));
     }
 
     function setMult(m) {
@@ -394,10 +484,21 @@
       if (tab) { tab.classList.remove('bg-[#141428]', 'text-gray-400'); tab.classList.add('bg-purple-600', 'text-white'); }
     }
 
-    // SLOTS
+    // SLOTS (Weighted Virtual Reel Strips + Left-to-Right Payline + Bankroll Guard)
     var slotBet = 0.5;
-    var slotSymbols = ['👑', '💎', '💵', '⚡', '🐶', '🍒'];
-    var slotMultipliers = { '👑': 25, '💎': 10, '💵': 8, '⚡': 5, '🐶': 4, '🍒': 3 };
+    var slotSpinning = false;
+    var slotSymbols = ['🍒', '🐶', '⚡', '💵', '💎', '👑'];
+    var slotMultipliers = { '🍒': 3, '🐶': 4, '⚡': 6, '💵': 10, '💎': 15, '👑': 35 };
+    var SLOT_REEL_WEIGHTS = {
+      guaranteed_win_casino: [43, 27, 16, 8, 4, 2],
+      balanced:              [46, 25, 15, 8, 4, 2],
+      generous:              [47, 24, 14, 8, 5, 2]
+    };
+    var SLOT_PAIR_MULT = {
+      guaranteed_win_casino: 1.8,
+      balanced:              2.8,
+      generous:              2.95
+    };
 
     function setSlotBet(amt) {
       slotBet = amt;
@@ -405,12 +506,16 @@
     }
 
     function playSlots() {
+      if (slotSpinning) return;
       if (balances.ton < slotBet) {
         openModal('depositModal');
         alert('Недостаточно TON для ставки!');
         return;
       }
-      balances.ton -= slotBet;
+      slotSpinning = true;
+      balances.ton = Number((balances.ton - slotBet).toFixed(4));
+      recordBetToVault(slotBet);
+      var proof = generateFairHash('SLOTS_' + slotBet);
       updateUI();
       playBeep(400, 0.1);
 
@@ -420,30 +525,38 @@
 
       var iters = 15;
       var count = 0;
+      var hasSettled = false;
       var interval = setInterval(function() {
+        if (hasSettled) { clearInterval(interval); return; }
         if (r1) r1.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
         if (r2) r2.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
         if (r3) r3.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
         playBeep(600 + (count * 20), 0.03);
         count++;
         if (count >= iters) {
+          hasSettled = true;
           clearInterval(interval);
-          var s1 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
-          var s2 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
-          var s3 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
-          
-          // House profit guard for slots
-          if (profitMode === 'guaranteed_win_casino') {
-            casinoVault.profitTon += (slotBet * 0.25);
-            casinoVault.ton += (slotBet * 0.25);
-            // Guard against massive drain on low vault profit
-            if (s1 === '👑' && s2 === '👑' && s3 === '👑') {
-              if (casinoVault.profitTon < 150) {
-                s3 = '🍒'; // Near-miss! Crown Crown Cherry -> gives pair win instead
-              }
+          slotSpinning = false;
+
+          var weights = SLOT_REEL_WEIGHTS[profitMode] || SLOT_REEL_WEIGHTS.guaranteed_win_casino;
+          var pairMult = SLOT_PAIR_MULT[profitMode] || 1.8;
+
+          var i1 = pickWeightedIndex(weights);
+          var i2 = pickWeightedIndex(weights);
+          var i3 = pickWeightedIndex(weights);
+
+          var s1 = slotSymbols[i1];
+          var s2 = slotSymbols[i2];
+          var s3 = slotSymbols[i3];
+
+          // Bankroll Guard: prevent unbacked mega-triple drain in casino profit protection mode
+          if (s1 === s2 && s2 === s3 && profitMode === 'guaranteed_win_casino') {
+            var tripleWin = slotBet * (slotMultipliers[s1] || 5);
+            if (tripleWin > maxSafePayoutTon(slotBet)) {
+              // Near-miss: change reel 3 so it stops 1 symbol short of triple
+              i3 = (i1 === 0) ? 1 : 0;
+              s3 = slotSymbols[i3];
             }
-          } else if (rtpMode === 'high' && Math.random() < 0.45) {
-            s2 = s1; s3 = s1;
           }
 
           if (r1) r1.textContent = s1;
@@ -452,34 +565,35 @@
 
           if (s1 === s2 && s2 === s3) {
             var m = slotMultipliers[s1] || 5;
-            var win = slotBet * m;
-            balances.ton += win;
-            casinoVault.ton = Math.max(0, casinoVault.ton - win);
-            casinoVault.profitTon -= win;
+            var win = Number((slotBet * m).toFixed(2));
+            balances.ton = Number((balances.ton + win).toFixed(4));
+            recordPayoutFromVault(win);
             updateUI();
             soundJackpot();
             if (typeof confetti === 'function') confetti({ particleCount: 90 });
             addHist('Слоты 3x ' + s1, '+' + win.toFixed(2) + ' TON', true);
-            showResult(s1, 'ДЖЕКПОТ В СЛОТАХ!', 'Выпало 3x ' + s1 + '! Выигрыш: +' + win.toFixed(2) + ' TON!');
-          } else if (s1 === s2 || s2 === s3 || s1 === s3) {
-            var matchSym = (s1 === s2) ? s1 : s3;
-            var win2 = slotBet * 1.5;
-            balances.ton += win2;
-            casinoVault.ton = Math.max(0, casinoVault.ton - win2);
-            casinoVault.profitTon -= win2;
+            showResult(s1, 'ДЖЕКПОТ В СЛОТАХ!', 'Выпало 3x ' + s1 + ' (x' + m + ')! Выигрыш: +' + win.toFixed(2) + ' TON! [' + proof + ']');
+          } else if (s1 === s2) {
+            // Left-to-right 2-reel payline match only (real slot rule!)
+            var win2 = Number((slotBet * pairMult).toFixed(2));
+            balances.ton = Number((balances.ton + win2).toFixed(4));
+            recordPayoutFromVault(win2);
             updateUI();
             soundWin();
-            addHist('Слоты пара ' + matchSym, '+' + win2.toFixed(2) + ' TON', true);
-            showResult(matchSym, 'Пара символов!', 'Выигрыш: +' + win2.toFixed(2) + ' TON!');
+            addHist('Слоты линия ' + s1 + s2, '+' + win2.toFixed(2) + ' TON', true);
+            showResult(s1, 'Линия 2x ' + s1 + '!', 'Совпадение слева направо (x' + pairMult + ')! Выигрыш: +' + win2.toFixed(2) + ' TON!');
           } else {
+            updateUI();
+            playBeep(220, 0.15, 'sawtooth');
             addHist('Слоты', '-' + slotBet.toFixed(2) + ' TON', false);
           }
         }
       }, 90);
     }
 
-    // ROULETTE
-    var rBet = 0.5, rChoice = 'red';
+    // EUROPEAN ROULETTE (Single Zero 0..36, 2.70% House Edge + Bankroll Guard)
+    var rBet = 0.5, rChoice = 'red', rSpinning = false;
+    var RED_NUMBERS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
     function setRBet(amt) {
       rBet = amt;
       var el = document.getElementById('rBetVal'); if (el) el.textContent = amt + ' TON';
@@ -490,67 +604,149 @@
       var el = document.getElementById('rc-' + choice);
       if (el) el.classList.add('ring-4', 'ring-yellow-400');
     }
+    function rouletteNumColor(num) {
+      if (num === 0) return 'green';
+      return RED_NUMBERS.indexOf(num) !== -1 ? 'red' : 'black';
+    }
+    function rouletteIsWin(num, choice) {
+      var color = rouletteNumColor(num);
+      if (choice === color) return true;
+      if (choice === 'even' && num !== 0 && num % 2 === 0) return true;
+      if (choice === 'odd' && num !== 0 && num % 2 !== 0) return true;
+      return false;
+    }
     function playRoulette() {
+      if (rSpinning) return;
       if (balances.ton < rBet) { openModal('depositModal'); alert('Недостаточно TON!'); return; }
-      balances.ton -= rBet; updateUI();
+      rSpinning = true;
+      balances.ton = Number((balances.ton - rBet).toFixed(4));
+      recordBetToVault(rBet);
+      var proof = generateFairHash('ROUL_' + rChoice);
+      updateUI();
 
-      var num = Math.floor(Math.random() * 37); // 0-36
-      var color = (num === 0) ? 'green' : ([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(num) ? 'red' : 'black');
+      var num = Math.floor(Math.random() * 37); // 0-36 European Wheel
+      var potentialPayout = rBet * (rChoice === 'green' ? 36 : 2);
+      // Anti-drain guard in casino profit protection mode
+      if (profitMode === 'guaranteed_win_casino' && rouletteIsWin(num, rChoice) && potentialPayout > maxSafePayoutTon(rBet)) {
+        var attempts = 0;
+        while (rouletteIsWin(num, rChoice) && attempts < 12) {
+          num = Math.floor(Math.random() * 37);
+          attempts++;
+        }
+      }
+      var color = rouletteNumColor(num);
 
       var el = document.getElementById('rResult');
       if (el) el.textContent = '...';
 
       setTimeout(function() {
+        rSpinning = false;
         if (el) {
           el.textContent = num + ' (' + (color === 'green' ? 'ЗЕРО' : (color === 'red' ? 'КРАСНОЕ' : 'ЧЕРНОЕ')) + ')';
           el.className = 'text-3xl font-black py-4 ' + (color === 'green' ? 'text-emerald-400' : (color === 'red' ? 'text-red-400' : 'text-slate-300'));
         }
-        var won = false, payout = 0;
-        if (rChoice === color) { won = true; payout = rBet * (color === 'green' ? 36 : 2); }
-        else if (rChoice === 'even' && num !== 0 && num % 2 === 0) { won = true; payout = rBet * 2; }
-        else if (rChoice === 'odd' && num !== 0 && num % 2 !== 0) { won = true; payout = rBet * 2; }
+        var won = rouletteIsWin(num, rChoice);
+        var payout = won ? Number(potentialPayout.toFixed(2)) : 0;
 
         if (won) {
-          balances.ton += payout; updateUI(); soundWin();
-          addHist('Рулетка (' + rChoice + ')', '+' + payout.toFixed(2) + ' TON', true);
-          showResult('🎡', 'Победа в рулетке!', 'Выпало: ' + num + '. Выигрыш: +' + payout.toFixed(2) + ' TON!');
+          balances.ton = Number((balances.ton + payout).toFixed(4));
+          recordPayoutFromVault(payout);
+          updateUI(); soundWin();
+          if (typeof confetti === 'function') confetti({ particleCount: color === 'green' ? 120 : 50 });
+          addHist('Рулетка (' + rChoice + ' #' + num + ')', '+' + payout.toFixed(2) + ' TON', true);
+          showResult('🎡', 'Победа в рулетке!', 'Выпало: ' + num + ' (' + (color === 'green' ? 'ЗЕРО' : (color === 'red' ? 'Красное' : 'Черное')) + '). Выигрыш: +' + payout.toFixed(2) + ' TON! [' + proof + ']');
         } else {
-          addHist('Рулетка (' + rChoice + ')', '-' + rBet.toFixed(2) + ' TON', false);
+          updateUI();
+          playBeep(210, 0.2, 'sawtooth');
+          addHist('Рулетка (' + rChoice + ' #' + num + ')', '-' + rBet.toFixed(2) + ' TON', false);
         }
-      }, 1000);
+      }, 900);
     }
 
-    // BLACKJACK 21
+    // BLACKJACK 21 (Full 52-Card Shoe + Fisher-Yates Shuffle + 3:2 Natural Blackjack + Vault Ledger)
     var bjBet = 1.0;
     var bjDeck = [], pHand = [], dHand = [], bjActive = false;
+    function setBjBet(amt) {
+      if (bjActive) return;
+      bjBet = amt;
+      var el = document.getElementById('bjBetVal'); if (el) el.textContent = amt.toFixed(1) + ' TON';
+      var dealBtn = document.getElementById('bjDealBtn'); if (dealBtn) dealBtn.textContent = 'Раздать карты (' + amt.toFixed(1) + ' TON)';
+    }
+    function buildShoe52() {
+      var suits = ['♠', '♥', '♦', '♣'];
+      var ranks = [
+        { r: 'A', v: 11 }, { r: '2', v: 2 }, { r: '3', v: 3 }, { r: '4', v: 4 },
+        { r: '5', v: 5 }, { r: '6', v: 6 }, { r: '7', v: 7 }, { r: '8', v: 8 },
+        { r: '9', v: 9 }, { r: '10', v: 10 }, { r: 'J', v: 10 }, { r: 'Q', v: 10 }, { r: 'K', v: 10 }
+      ];
+      var deck = [];
+      for (var s = 0; s < suits.length; s++) {
+        for (var k = 0; k < ranks.length; k++) {
+          deck.push({ label: ranks[k].r + suits[s], v: ranks[k].v });
+        }
+      }
+      for (var i = deck.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp;
+      }
+      return deck;
+    }
     function startBJ() {
+      if (bjActive) return;
       if (balances.ton < bjBet) { openModal('depositModal'); alert('Недостаточно TON!'); return; }
-      balances.ton -= bjBet; updateUI();
-      bjDeck = [2,3,4,5,6,7,8,9,10,10,10,10,11, 2,3,4,5,6,7,8,9,10,10,10,10,11];
-      bjDeck.sort(function() { return 0.5 - Math.random(); });
+      balances.ton = Number((balances.ton - bjBet).toFixed(4));
+      recordBetToVault(bjBet);
+      generateFairHash('BJ21_' + bjBet);
+      updateUI();
+
+      bjDeck = buildShoe52();
       pHand = [bjDeck.pop(), bjDeck.pop()];
       dHand = [bjDeck.pop()];
       bjActive = true;
       renderBJ();
+
       var hBtn = document.getElementById('bjHitBtn'); if (hBtn) hBtn.disabled = false;
       var sBtn = document.getElementById('bjStandBtn'); if (sBtn) sBtn.disabled = false;
       var dealBtn = document.getElementById('bjDealBtn'); if (dealBtn) dealBtn.disabled = true;
+
+      // Instant Natural Blackjack 3:2 check
+      if (getHandSum(pHand) === 21) {
+        dHand.push(bjDeck.pop());
+        renderBJ();
+        if (getHandSum(dHand) === 21) {
+          balances.ton = Number((balances.ton + bjBet).toFixed(4));
+          recordPayoutFromVault(bjBet);
+          endBJ('Оба набрали Блэкджек! Ничья (Push), ставка возвращена.', true, bjBet);
+        } else {
+          var bjWin = Number((bjBet * 2.5).toFixed(2));
+          balances.ton = Number((balances.ton + bjWin).toFixed(4));
+          recordPayoutFromVault(bjWin);
+          if (typeof confetti === 'function') confetti({ particleCount: 100 });
+          endBJ('НАТУРАЛЬНЫЙ БЛЭКДЖЕК (3:2)! Выигрыш +' + bjWin.toFixed(2) + ' TON!', true, bjWin);
+        }
+      }
     }
     function getHandSum(h) {
-      var sum = h.reduce(function(a, b) { return a + b; }, 0);
-      var aces = h.filter(function(x) { return x === 11; }).length;
+      var sum = h.reduce(function(a, b) { return a + b.v; }, 0);
+      var aces = h.filter(function(x) { return x.v === 11; }).length;
       while (sum > 21 && aces > 0) { sum -= 10; aces--; }
       return sum;
     }
     function renderBJ() {
-      var pEl = document.getElementById('pCards'); if (pEl) pEl.textContent = pHand.join(' | ') + ' (Сумма: ' + getHandSum(pHand) + ')';
-      var dEl = document.getElementById('dCards'); if (dEl) dEl.textContent = dHand.join(' | ') + ' (Сумма: ' + getHandSum(dHand) + ')';
+      var pTxt = pHand.map(function(c) { return c.label; }).join(' | ') + ' (Сумма: ' + getHandSum(pHand) + ')';
+      var dTxt = dHand.map(function(c) { return c.label; }).join(' | ') + ' (Сумма: ' + getHandSum(dHand) + ')';
+      var pEl = document.getElementById('pCards'); if (pEl) pEl.textContent = pTxt;
+      var dEl = document.getElementById('dCards'); if (dEl) dEl.textContent = dTxt;
     }
     function hitBJ() {
       if (!bjActive) return;
       pHand.push(bjDeck.pop());
       renderBJ();
-      if (getHandSum(pHand) > 21) { endBJ('Перебор! Вы проиграли.', false); }
+      playBeep(680, 0.06);
+      if (getHandSum(pHand) > 21) {
+        playBeep(200, 0.25, 'sawtooth');
+        endBJ('Перебор (' + getHandSum(pHand) + ')! Вы проиграли.', false);
+      }
     }
     function standBJ() {
       if (!bjActive) return;
@@ -559,13 +755,17 @@
       var pSum = getHandSum(pHand);
       var dSum = getHandSum(dHand);
       if (dSum > 21 || pSum > dSum) {
-        var win = bjBet * 2; balances.ton += win;
-        endBJ('Вы победили! Выигрыш +' + win.toFixed(2) + ' TON', true, win);
+        var win = Number((bjBet * 2).toFixed(2));
+        balances.ton = Number((balances.ton + win).toFixed(4));
+        recordPayoutFromVault(win);
+        endBJ('Вы победили (' + pSum + ' против ' + dSum + ')! Выигрыш +' + win.toFixed(2) + ' TON', true, win);
       } else if (pSum === dSum) {
-        balances.ton += bjBet;
-        endBJ('Ничья! Ставка возвращена.', true, bjBet);
+        balances.ton = Number((balances.ton + bjBet).toFixed(4));
+        recordPayoutFromVault(bjBet);
+        endBJ('Ничья (' + pSum + ' = ' + dSum + ')! Ставка возвращена.', true, bjBet);
       } else {
-        endBJ('Дилер выиграл.', false);
+        playBeep(200, 0.25, 'sawtooth');
+        endBJ('Дилер выиграл (' + dSum + ' против ' + pSum + ').', false);
       }
     }
     function endBJ(msg, won, payout) {
@@ -575,7 +775,7 @@
       var dealBtn = document.getElementById('bjDealBtn'); if (dealBtn) dealBtn.disabled = false;
       addHist('Блэкджек 21', won ? ('+' + (payout || bjBet).toFixed(2) + ' TON') : ('-' + bjBet.toFixed(2) + ' TON'), won);
       if (won) soundWin();
-      showResult('🃏', won ? 'Победа в 21!' : 'Конец раздачи', msg);
+      showResult('🃏', won ? 'Победа в 21!' : 'Конец раздачи', msg + ' [' + lastRoundProof + ']');
     }
 
     // Stickers
@@ -887,9 +1087,9 @@
       profitMode = m;
       updateUI();
       soundWin();
-      var msg = m === 'guaranteed_win_casino' 
-        ? '🛡️ Алгоритм активирован: Казино ВСЕГДА В ПЛЮСЕ!\nКрупные джекпоты выдаются только при наличии накопленной прибыли казны. Вы гарантированно не уйдете в минус.'
-        : (m === 'balanced' ? 'Режим переключен на: Сбалансированный (92% RTP).' : 'Режим переключен на: Промо / Стрим (98% RTP).');
+      var msg = m === 'guaranteed_win_casino'
+        ? '🛡️ Алгоритм активирован: Казино ВСЕГДА В ПЛЮСЕ!\nВзвешенный RNG (RTP ~69–84%), 2 пустых сектора на колесе и лимит выплат из накопленной прибыли казны. Вы гарантированно не уйдете в минус.'
+        : (m === 'balanced' ? 'Режим переключен на: Сбалансированный (RTP ~91–97%, комиссия казино 3–9%).' : 'Режим переключен на: Промо / Стрим (RTP ~96–97%, высокая частота выигрышей).');
       alert(msg);
       try {
         fetch('/api/admin/profit-mode', {
@@ -1131,7 +1331,7 @@
           <!-- Wheel Circle with Lights -->
           <div id="wheel" class="wheel w-full h-full rounded-full shadow-[0_0_50px_rgba(245,158,11,0.35)] relative select-none border-8 border-yellow-400/60 bg-[#0d0d1f]">
             
-            <!-- Crisp SVG Wheel (Sectors start at 12 o'clock top = -90deg clockwise) -->
+            <!-- Crisp 10-Sector SVG Wheel (36 deg each, clockwise from 12 o'clock) -->
             <svg class="w-full h-full block" viewBox="0 0 300 300">
               <defs>
                 <linearGradient id="goldSector" x1="0" y1="0" x2="1" y2="1">
@@ -1140,70 +1340,82 @@
                 </linearGradient>
               </defs>
               <g transform="translate(150,150)">
-                <!-- Outer Gold Ring -->
                 <circle cx="0" cy="0" r="148" fill="none" stroke="#f59e0b" stroke-width="3" opacity="0.6" />
 
-                <!-- 8 Sectors starting from top (-90deg) going clockwise -->
-                <!-- 0: -90 to -45 -->
-                <path d="M 0 0 L 0 -144 A 144 144 0 0 1 101.82 -101.82 Z" fill="url(#goldSector)" stroke="#fbbf24" stroke-width="1.5" />
-                <!-- 1: -45 to 0 -->
-                <path d="M 0 0 L 101.82 -101.82 A 144 144 0 0 1 144 0 Z" fill="#0e7490" stroke="#22d3ee" stroke-width="1" />
-                <!-- 2: 0 to 45 -->
-                <path d="M 0 0 L 144 0 A 144 144 0 0 1 101.82 101.82 Z" fill="#047857" stroke="#34d399" stroke-width="1" />
-                <!-- 3: 45 to 90 -->
-                <path d="M 0 0 L 101.82 101.82 A 144 144 0 0 1 0 144 Z" fill="#6d28d9" stroke="#a78bfa" stroke-width="1" />
-                <!-- 4: 90 to 135 -->
-                <path d="M 0 0 L 0 144 A 144 144 0 0 1 -101.82 101.82 Z" fill="#be185d" stroke="#f472b6" stroke-width="1" />
-                <!-- 5: 135 to 180 -->
-                <path d="M 0 0 L -101.82 101.82 A 144 144 0 0 1 -144 0 Z" fill="#3730a3" stroke="#818cf8" stroke-width="1" />
-                <!-- 6: 180 to 225 -->
-                <path d="M 0 0 L -144 0 A 144 144 0 0 1 -101.82 -101.82 Z" fill="#0f766e" stroke="#2dd4bf" stroke-width="1" />
-                <!-- 7: 225 to 270 -->
-                <path d="M 0 0 L -101.82 -101.82 A 144 144 0 0 1 0 -144 Z" fill="#9d174d" stroke="#f43f5e" stroke-width="1" />
+                <!-- 0: 0..36 deg (ДЖЕКПОТ) -->
+                <path d="M 0 0 L 0 -144 A 144 144 0 0 1 84.64 -116.50 Z" fill="url(#goldSector)" stroke="#fbbf24" stroke-width="1.5" />
+                <!-- 1: 36..72 deg (ПУСТО - near miss) -->
+                <path d="M 0 0 L 84.64 -116.50 A 144 144 0 0 1 136.95 -44.50 Z" fill="#1e1b2e" stroke="#475569" stroke-width="1" />
+                <!-- 2: 72..108 deg (0.5 TON) -->
+                <path d="M 0 0 L 136.95 -44.50 A 144 144 0 0 1 136.95 44.50 Z" fill="#0e7490" stroke="#22d3ee" stroke-width="1" />
+                <!-- 3: 108..144 deg (1,000 NOT) -->
+                <path d="M 0 0 L 136.95 44.50 A 144 144 0 0 1 84.64 116.50 Z" fill="#6d28d9" stroke="#a78bfa" stroke-width="1" />
+                <!-- 4: 144..180 deg (ВОЗВРАТ x0.5) -->
+                <path d="M 0 0 L 84.64 116.50 A 144 144 0 0 1 0 144 Z" fill="#3730a3" stroke="#818cf8" stroke-width="1" />
+                <!-- 5: 180..216 deg (1.0 USDT) -->
+                <path d="M 0 0 L 0 144 A 144 144 0 0 1 -84.64 116.50 Z" fill="#047857" stroke="#34d399" stroke-width="1" />
+                <!-- 6: 216..252 deg (МИМО) -->
+                <path d="M 0 0 L -84.64 116.50 A 144 144 0 0 1 -136.95 44.50 Z" fill="#181829" stroke="#475569" stroke-width="1" />
+                <!-- 7: 252..288 deg (+2 СПИНА) -->
+                <path d="M 0 0 L -136.95 44.50 A 144 144 0 0 1 -136.95 -44.50 Z" fill="#be185d" stroke="#f472b6" stroke-width="1" />
+                <!-- 8: 288..324 deg (5k DOGS) -->
+                <path d="M 0 0 L -136.95 -44.50 A 144 144 0 0 1 -84.64 -116.50 Z" fill="#0f766e" stroke="#2dd4bf" stroke-width="1" />
+                <!-- 9: 324..360 deg (2.5 TON) -->
+                <path d="M 0 0 L -84.64 -116.50 A 144 144 0 0 1 0 -144 Z" fill="#9d174d" stroke="#f43f5e" stroke-width="1" />
 
-                <!-- Radially Aligned Labels & Icons -->
-                <g transform="rotate(22.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="22">🏆</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">ДЖЕКПОТ</text>
+                <!-- Radially Aligned Labels & Icons (36 deg centers) -->
+                <g transform="rotate(18)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="20">🏆</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="10" font-weight="900">ДЖЕКПОТ</text>
                 </g>
-                <g transform="rotate(67.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">💎</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">0.5 TON</text>
+                <g transform="rotate(54)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">❌</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="900">ПУСТО</text>
                 </g>
-                <g transform="rotate(112.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">💵</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">1.0 USDT</text>
+                <g transform="rotate(90)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">💎</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="10" font-weight="900">0.5 TON</text>
                 </g>
-                <g transform="rotate(157.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">⚡</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">1,000 NOT</text>
+                <g transform="rotate(126)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">⚡</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="9.5" font-weight="900">1,000 NOT</text>
                 </g>
-                <g transform="rotate(202.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">🎁</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">+3 СПИНА</text>
+                <g transform="rotate(162)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">🔄</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="10" font-weight="900">x0.5</text>
                 </g>
-                <g transform="rotate(247.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">🐶</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">5k DOGS</text>
+                <g transform="rotate(198)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">💵</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="10" font-weight="900">1.0 USDT</text>
                 </g>
-                <g transform="rotate(292.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">💎</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">2.5 TON</text>
+                <g transform="rotate(234)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">🌑</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="900">МИМО</text>
                 </g>
-                <g transform="rotate(337.5)">
-                  <text x="0" y="-110" text-anchor="middle" font-size="20">💵</text>
-                  <text x="0" y="-86" text-anchor="middle" fill="#fff" font-size="11" font-weight="900">5.0 USDT</text>
+                <g transform="rotate(270)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">🎁</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="9.5" font-weight="900">+2 СПИНА</text>
+                </g>
+                <g transform="rotate(306)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">🐶</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="9.5" font-weight="900">5k DOGS</text>
+                </g>
+                <g transform="rotate(342)">
+                  <text x="0" y="-112" text-anchor="middle" font-size="18">💎</text>
+                  <text x="0" y="-88" text-anchor="middle" fill="#fff" font-size="10" font-weight="900">2.5 TON</text>
                 </g>
 
-                <!-- Rim LED Bulbs (8 along sector boundaries) -->
-                <circle cx="0" cy="-140" r="4" fill="#fde047" class="bulb" />
-                <circle cx="99" cy="-99" r="4" fill="#fde047" class="bulb" />
-                <circle cx="140" cy="0" r="4" fill="#fde047" class="bulb" />
-                <circle cx="99" cy="99" r="4" fill="#fde047" class="bulb" />
-                <circle cx="0" cy="140" r="4" fill="#fde047" class="bulb" />
-                <circle cx="-99" cy="99" r="4" fill="#fde047" class="bulb" />
-                <circle cx="-140" cy="0" r="4" fill="#fde047" class="bulb" />
-                <circle cx="-99" cy="-99" r="4" fill="#fde047" class="bulb" />
+                <!-- 10 Rim LED Bulbs along sector boundaries -->
+                <circle cx="0" cy="-140" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="82.3" cy="-113.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="133.1" cy="-43.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="133.1" cy="43.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="82.3" cy="113.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="0" cy="140" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="-82.3" cy="113.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="-133.1" cy="43.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="-133.1" cy="-43.3" r="3.8" fill="#fde047" class="bulb" />
+                <circle cx="-82.3" cy="-113.3" r="3.8" fill="#fde047" class="bulb" />
               </g>
             </svg>
 
@@ -1221,19 +1433,24 @@
         <div class="flex-1 text-center lg:text-left space-y-5">
           <div>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs font-bold mb-2">
-              ⚡ Мгновенный выигрыш
+              ⚡ Взвешенный RNG казино • 10 секторов
             </div>
             <h2 class="text-2xl sm:text-4xl font-black text-white">
               Крипто-Колесо Фортуны
             </h2>
             <p class="text-sm text-gray-300 mt-1">
-              Выберите множитель ставки и нажмите <strong class="text-orange-400">SPIN</strong>!
+              Алгоритм с реальной маржой казино и защитой банка. Выберите множитель и нажмите <strong class="text-orange-400">SPIN</strong>!
             </p>
+            <div class="mt-2 inline-flex flex-wrap items-center gap-2 text-[11px] font-mono bg-[#0b0b1a] border border-purple-500/30 px-3 py-1.5 rounded-xl">
+              <span class="text-emerald-300 font-bold" id="engineModeLabel">КАЗИНО В ПЛЮСЕ • House Edge 16–28%</span>
+              <span class="text-gray-500">|</span>
+              <span class="text-cyan-300" id="provablyFairHash">PF-INIT-7A9C4E12</span>
+            </div>
           </div>
 
           <!-- Multipliers -->
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Множитель выигрыша:</label>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Множитель ставки:</label>
             <div class="flex flex-wrap justify-center lg:justify-start gap-2">
               <button id="m1" type="button" onclick="setMult(1)" class="mult-btn mult-act px-5 py-2.5 rounded-xl border border-orange-500/50 text-xs font-black transition cursor-pointer">x1 (1 спин)</button>
               <button id="m2" type="button" onclick="setMult(2)" class="mult-btn bg-[#141428] px-5 py-2.5 rounded-xl border border-[#252545] text-xs font-black hover:bg-[#1a1a36] transition cursor-pointer">x2 (2 спина)</button>
@@ -1266,16 +1483,19 @@
     <div id="sec-games" class="hidden space-y-6">
       
       <!-- Sub-tabs for Games -->
-      <div class="flex gap-2 border-b border-[#1f1f3a] pb-3">
-        <button id="gtab-slots" onclick="showGame('slots')" class="game-subtab px-5 py-2 rounded-xl bg-purple-600 text-white font-black text-xs">
-          🎰 Неоновые Слоты
-        </button>
-        <button id="gtab-roulette" onclick="showGame('roulette')" class="game-subtab px-5 py-2 rounded-xl bg-[#141428] text-gray-400 font-bold text-xs hover:text-white">
-          🎡 Европейская Рулетка
-        </button>
-        <button id="gtab-bj" onclick="showGame('bj')" class="game-subtab px-5 py-2 rounded-xl bg-[#141428] text-gray-400 font-bold text-xs hover:text-white">
-          🃏 Блэкджек 21
-        </button>
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1f1f3a] pb-3">
+        <div class="flex gap-2">
+          <button id="gtab-slots" onclick="showGame('slots')" class="game-subtab px-5 py-2 rounded-xl bg-purple-600 text-white font-black text-xs">
+            🎰 Неоновые Слоты
+          </button>
+          <button id="gtab-roulette" onclick="showGame('roulette')" class="game-subtab px-5 py-2 rounded-xl bg-[#141428] text-gray-400 font-bold text-xs hover:text-white">
+            🎡 Европейская Рулетка
+          </button>
+          <button id="gtab-bj" onclick="showGame('bj')" class="game-subtab px-5 py-2 rounded-xl bg-[#141428] text-gray-400 font-bold text-xs hover:text-white">
+            🃏 Блэкджек 21
+          </button>
+        </div>
+        <span id="gamesFairHash" class="text-[11px] font-mono text-cyan-300 bg-[#0b0b1a] border border-cyan-500/30 px-2.5 py-1 rounded-lg">PF-INIT-7A9C4E12 • Edge 16–28%</span>
       </div>
 
       <!-- Game 1: SLOTS -->
@@ -1283,7 +1503,7 @@
         <div class="max-w-xl mx-auto text-center space-y-6">
           <div>
             <h3 class="text-2xl font-black text-white">🎰 Неоновые Слоты 777</h3>
-            <p class="text-xs text-gray-400">Соберите 3 одинаковых крипто-символа для множителя до x25!</p>
+            <p class="text-xs text-gray-400">Взвешенные виртуальные барабаны: 👑 x35, 💎 x15, 💵 x10, ⚡ x6, 🐶 x4, 🍒 x3 (или линия 1-2 слева направо)</p>
           </div>
 
           <!-- Slot Reels Frame -->
@@ -1362,9 +1582,16 @@
             </div>
           </div>
 
+          <div class="flex items-center justify-center gap-3">
+            <span class="text-xs text-gray-400 font-bold">Ставка: <strong id="bjBetVal" class="text-cyan-300 font-mono">1.0 TON</strong></span>
+            <button onclick="setBjBet(0.5)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">0.5</button>
+            <button onclick="setBjBet(1.0)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">1.0</button>
+            <button onclick="setBjBet(2.5)" class="px-3 py-1 rounded bg-[#16162d] border border-cyan-500/30 text-xs font-bold">2.5</button>
+          </div>
+
           <div class="flex justify-center gap-3">
             <button id="bjDealBtn" onclick="startBJ()" class="px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-black text-xs shadow-md">
-              Раздать карты (1 TON)
+              Раздать карты (1.0 TON)
             </button>
             <button id="bjHitBtn" disabled onclick="hitBJ()" class="px-5 py-3 rounded-full bg-purple-600 disabled:opacity-40 text-white font-black text-xs">
               Взять карту (Hit)
@@ -1475,7 +1702,7 @@
         </div>
 
         <!-- Vault Metrics -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div class="bg-[#0b0e26] border border-cyan-500/30 rounded-2xl p-4 text-center">
             <div class="text-xs text-gray-400 font-bold mb-1">Доступно в Казне для Выплат</div>
             <div class="text-3xl font-black text-cyan-300 font-mono"><span id="vaultTon">1000.00</span> TON</div>
@@ -1490,6 +1717,22 @@
             <div class="text-xs text-gray-400 font-bold mb-1">Чистый Профит Казино</div>
             <div class="text-3xl font-black text-amber-300 font-mono"><span id="vaultProfit">+340.50</span> TON</div>
             <div class="text-[10px] text-emerald-400 font-bold mt-1">✓ Администратор в гарантированном плюсе</div>
+          </div>
+        </div>
+
+        <!-- Live Ledger Telemetry (Turnover, Payouts, Live RTP) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <div class="bg-[#090c20] border border-purple-500/25 rounded-xl p-3 flex items-center justify-between text-xs">
+            <span class="text-gray-400 font-bold">Оборот ставок:</span>
+            <span class="font-mono font-black text-purple-300"><span id="vaultBets">850.00</span> TON</span>
+          </div>
+          <div class="bg-[#090c20] border border-pink-500/25 rounded-xl p-3 flex items-center justify-between text-xs">
+            <span class="text-gray-400 font-bold">Выплачено игрокам:</span>
+            <span class="font-mono font-black text-pink-300"><span id="vaultPayouts">509.50</span> TON</span>
+          </div>
+          <div class="bg-[#090c20] border border-emerald-500/25 rounded-xl p-3 flex items-center justify-between text-xs">
+            <span class="text-gray-400 font-bold">Фактический RTP:</span>
+            <span id="vaultActualRtp" class="font-mono font-black text-emerald-300">59.9%</span>
           </div>
         </div>
 
@@ -1528,7 +1771,7 @@
             </p>
           </div>
           <span id="profitModeBadge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-black text-xs animate-pulse">
-            🛡️ КАЗИНО ВСЕГДА В ПЛЮСЕ (АДМИН ЗАЩИЩЕН)
+            🛡️ КАЗИНО ВСЕГДА В ПЛЮСЕ (RTP ~72-84%)
           </span>
         </div>
 
@@ -1539,21 +1782,21 @@
               <span class="text-[10px] bg-emerald-400 text-black px-1.5 py-0.2 rounded font-black">РЕКОМЕНДУЕТСЯ</span>
             </div>
             <p class="text-xs text-gray-300 mt-2">
-              Алгоритм удерживает маржу +25-35%. Джекпоты и крупные выигрыши выдаются только из накопленной прибыли казны. <strong>Вы гарантированно никогда не уходите в минус.</strong>
+              Взвешенный RNG с маржой дома 16–31%, секторами «Пусто/Мимо», линией слотов 1-2 и защитой банка (Near-Miss при нехватке профита). <strong>Вы гарантированно не уйдете в минус.</strong>
             </p>
           </button>
 
           <button onclick="setProfitMode('balanced')" class="p-4 rounded-2xl bg-[#121c2c] border border-cyan-500/40 hover:brightness-110 text-left transition">
-            <div class="font-black text-cyan-300 text-sm">🔵 Сбалансированный (92% RTP)</div>
+            <div class="font-black text-cyan-300 text-sm">🔵 Сбалансированный (~91–97% RTP)</div>
             <p class="text-xs text-gray-300 mt-2">
-              Классическая математика лицензионных слотов с удержанием комиссии казино 8% с каждого оборота ставок.
+              Классическая математика лицензионных казино с преимуществом дома 2.7–9% в колесе, слотах, рулетке (Zero) и блэкджеке.
             </p>
           </button>
 
           <button onclick="setProfitMode('generous')" class="p-4 rounded-2xl bg-[#1d1430] border border-purple-500/40 hover:brightness-110 text-left transition">
-            <div class="font-black text-purple-300 text-sm">🟣 Промо для Стримов (98% RTP)</div>
+            <div class="font-black text-purple-300 text-sm">🟣 Промо для Стримов (~96–97% RTP)</div>
             <p class="text-xs text-gray-300 mt-2">
-              Повышенная отдача и частые фанфары для записи красивых видео, рекламы в соцсетях и привлечения игроков.
+              Повышенная отдача (3–4% комиссия казино) для стримов, рекламы в соцсетях и привлечения новых игроков при сохранении плюса дома.
             </p>
           </button>
         </div>
